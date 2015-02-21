@@ -1,0 +1,15 @@
+web:
+  image: dz0ny/wpbox
+  ports:
+   - 80:80
+  volumes:
+   - ./src:/var/www/html/wp-content/plugins/spider_block:ro
+  links:
+   - mysql
+mysql:
+  image: mysql
+  ports:
+    - 3306
+  environment:
+    MYSQL_DATABASE: wordpress
+    MYSQL_ROOT_PASSWORD: wordpress

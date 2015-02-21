@@ -1,0 +1,42 @@
+{
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "phpmd/phpmd": "1.4.*",
+        "squizlabs/php_codesniffer": "1.*",
+        "phpunit/phpunit": "3.7.*",
+        "10up/wp_mock": "dev-master",
+        "wordpress": "*"
+    },
+    "extra": {
+        "installer-paths": {
+            "vendor/{$name}/": [
+                "wordpress"
+            ]
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "wordpress",
+                "version": "4.1",
+                "type": "wordpress-plugin",
+                "dist": {
+                    "url": "http://wordpress.org/wordpress-4.1.zip",
+                    "type": "zip"
+                }
+            }
+        }
+    ],
+
+    "minimum-stability": "stable",
+    "config": {
+        "bin-dir": "bin/"
+    }
+}
