@@ -1,5 +1,8 @@
 vendor
 bin
+cover
 composer.lock
+tmp
+build
 .idea
 *~

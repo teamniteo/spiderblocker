@@ -1,13 +1,19 @@
 <?php
-	if ( !defined( "DB_USER" ) ) {
-		define( "DB_USER", "DB_USER" );
+
+	/**
+	 * @codeCoverageIgnore
+	 */
+	function apache_mod_loaded() {
+		return true;
 	}
 
-	function do_action() {
-	}
-	function add_filter() {
+	/**
+	 * @codeCoverageIgnore
+	 */
+	function apache_get_version() {
+		return true;
 	}
 
-	;
-	require_once 'vendor/autoload.php';
-	include_once "../src/index.php";
+	require_once __DIR__ . '/../vendor/autoload.php';
+	require_once __DIR__ . '/../vendor/antecedent/patchwork/Patchwork.php';
+	require_once __DIR__ . '/../src/index.php';
