@@ -3,7 +3,7 @@
 	/**
 	 * Plugin Name: Spider Blocker
 	 * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
-	 * Version:     1.0.0
+	 * Version:     1.0.1
 	 * Author:      NiteoWeb Ltd.
 	 * Author URI:  www.niteoweb.com
 	 */
@@ -26,6 +26,7 @@
 
 		function __construct() {
 			if ( is_admin() ) {
+				add_action( 'admin_notices', array( &$this, 'activatePluginNotice' ) );
 				add_action( 'admin_menu', array( &$this, 'adminMenu' ) );
 				add_action( 'wp_ajax_NSB-get_list', array( &$this, 'loadList' ) );
 				add_action( 'wp_ajax_NSB-set_list', array( &$this, 'saveList' ) );
@@ -34,11 +35,22 @@
 			add_action( 'generate_rewrite_rules', array( &$this, "generateRewriteRules" ) );
 		}
 
+		/**
+		 * @codeCoverageIgnore
+		 */
+		static function isHtaccessWritable() {
+			$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
+			$htaccess_file = $home_path . '.htaccess';
+
+			return is_writable( $htaccess_file );
+		}
+
 		function generateRewriteRules() {
 			global $wp_rewrite;
 
 			// Protect plugin from direct access
 			$wp_rewrite->add_external_rule( 'wp-content/plugins/spider_blocker/index.php', 'index.php%{REQUEST_URI}' );
+			$wp_rewrite->add_external_rule( 'wp-content/plugins/spider_blocker/readme.txt', 'index.php%{REQUEST_URI}' );
 			$wp_rewrite->add_external_rule( 'wp-content/plugins/spider_blocker/', 'index.php%{REQUEST_URI}' );
 		}
 
@@ -51,20 +63,26 @@
 			);
 		}
 
-		function loadList() {
-			check_ajax_referer( $this->nonce, 'nonce' );
-			wp_send_json_success( $this->getBots() );
+		/**
+		 * @codeCoverageIgnore
+		 */
+		function activatePluginNotice() {
+			if ( get_option( $this->option_name ) === false ) {
+				update_option( $this->option_name, $this->default_bots );
+				?>
+				<div class="notice notice-success">
+					<p>SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting <a
+							href="<?php echo admin_url( 'tools.php?page=ni_spider_block' ); ?>">Setting page</a>!</p>
+				</div>
+			<?php
+			}
 		}
 
-		private function getBots() {
-			return maybe_unserialize( get_option( $this->option_name, $this->default_bots ) );
-		}
-
-		function resetList() {
-			check_ajax_referer( $this->nonce, 'nonce' );
-			delete_option( $this->option_name );
+		/**
+		 * @codeCoverageIgnore
+		 */
+		function activatePlugin() {
 			$this->generateBlockRules();
-			wp_send_json_success( $this->getBots() );
 		}
 
 		function generateBlockRules() {
@@ -87,7 +105,7 @@
 		}
 
 		/**
-		 * Geneerate block rules based on enabled bots
+		 * Generate block rules based on enabled bots
 		 *
 		 * @return array
 		 */
@@ -106,6 +124,37 @@
 			$list[] = "</Limit>";
 
 			return $list;
+		}
+
+		private function getBots() {
+			return maybe_unserialize( get_option( $this->option_name, $this->default_bots ) );
+		}
+
+		function loadList() {
+			check_ajax_referer( $this->nonce, 'nonce' );
+			wp_send_json_success( $this->getBots() );
+		}
+
+		function resetList() {
+			check_ajax_referer( $this->nonce, 'nonce' );
+			delete_option( $this->option_name );
+			$this->generateBlockRules();
+			wp_send_json_success( $this->getBots() );
+		}
+
+		function removeBlockRules() {
+			global $wp_rewrite;
+			delete_option( $this->option_name );
+			$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
+			$htaccess_file = $home_path . '.htaccess';
+			$empty         = array();
+			if ( ( ! file_exists( $htaccess_file ) && is_writable( $home_path ) ) || is_writable( $htaccess_file ) ) {
+				if ( $this->modRewriteEnabled() ) {
+					insert_with_markers( $htaccess_file, 'NiteowebSpiderBlocker', $empty );
+				}
+			}
+
+			$wp_rewrite->flush_rules();
 		}
 
 		function saveList() {
@@ -139,6 +188,12 @@
 			add_thickbox();
 			?>
 			<style>
+				.notice.fixed {
+					position: fixed;
+					right: 1em;
+					top: 3.5em;
+				}
+
 				tr.active {
 					background-color: rgba(54, 204, 255, 0.05);
 				}
@@ -147,9 +202,22 @@
 					border-left: 4px solid #2ea2cc;
 				}
 			</style>
+
 			<h1>Spider Blocker</h1>
 			<hr/>
 			<div ng-app="spiderBlockApp">
+				<div ng-controller="NotificationsCtrl">
+					<div class="notice notice-{{ n.state }} fixed" ng-repeat="n in notifications"
+					     style="top: {{3.5*($index+1)}}em">
+						<p>{{n.msg}}
+							<a ng-click="removeNotification(notification)">
+								<span class="dashicons dashicons-no-alt"></span>
+							</a>
+						</p>
+					</div>
+				</div>
+
+
 				<div ng-controller="BotListCtrl">
 					<h2>Add New Bot</h2>
 
@@ -276,7 +344,25 @@
 								}
 							};
 						});
-						spiderBlockApp.controller('BotListCtrl', function ($scope, $http) {
+						spiderBlockApp.controller('NotificationsCtrl', function ($scope, $rootScope, $timeout) {
+							$scope.notifications = [];
+
+							$rootScope.$on('notification', function (event, data) {
+								$scope.notifications.push(data);
+								$timeout(function () {
+									$scope.removeNotification(data);
+								}, 3000);
+							});
+
+							$scope.removeNotification = function (notification) {
+								var index;
+								if ($scope.notifications !== undefined) {
+									index = $scope.notifications.indexOf(notification);
+									$scope.notifications.splice(index, 1);
+								}
+							}
+						});
+						spiderBlockApp.controller('BotListCtrl', function ($scope, $http, $rootScope) {
 							var wp_ajax = function (_req) {
 								_req.nonce = '<?php echo wp_create_nonce($this->nonce); ?>';
 								return $http({
@@ -311,8 +397,12 @@
 								}).success(function (res) {
 									if (res.success) {
 										$scope.bots = res.data;
+										$rootScope.$emit('notification', {
+											state: 'success',
+											msg: 'List of bots was saved and new blocklist applied!'
+										});
 									} else {
-										alert(res.data);
+										$rootScope.$emit('notification', {state: 'errror', msg: res.data});
 									}
 								});
 							};
@@ -322,16 +412,24 @@
 									action: 'NSB-reset_list'
 								}).success(function (res) {
 									$scope.bots = res.data;
+									$rootScope.$emit('notification', {
+										state: 'success',
+										msg: 'List of bots was reset to defaults!'
+									});
 								});
 							};
 
 							$scope.add = function () {
 								$scope.bots.push($scope.bot);
+								$rootScope.$emit('notification', {
+									state: 'success',
+									msg: 'Bot ' + $scope.bot.name + ' was added!'
+								});
 								$scope.bot = {"state": true};
 							};
 
 							$scope.remove = function (at) {
-								console.info(find_bot(at));
+								$rootScope.$emit('notification', {state: 'success', msg: 'Bot was removed!'});
 								$scope.bots.splice(find_bot(at), 1);
 							};
 						});
@@ -342,19 +440,33 @@
 		}
 	}
 
-	if ( ! apache_get_version() || ! NiteowebSpiderBlocker::modRewriteEnabled() ) {
-		?>
-		<div id="error-page">
-			<p>This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider about
-				upgrading your server software. Your Apache version is <b><?php echo apache_get_version(); ?></b></p>
-		</div>
-		<?php
-		die();
-	}
-
 	// Inside WordPress
 	if ( defined( 'ABSPATH' ) ) {
-		new NiteowebSpiderBlocker;
+		if ( ! apache_get_version() || ! NiteowebSpiderBlocker::modRewriteEnabled() ) {
+			?>
+			<div id="error-page">
+				<p>This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider
+					about
+					upgrading your server software. Your Apache version is <b><?php echo apache_get_version(); ?></b>
+				</p>
+			</div>
+			<?php
+			die();
+		}
+
+		if ( ! NiteowebSpiderBlocker::isHtaccessWritable() ) {
+			?>
+			<div id="error-page">
+				<p>This plugin requires <b>.htaccess</b> file that is writable by the server. Please enable write access
+					for file <b><?php echo ABSPATH . '.htaccess'; ?></b>.</p>
+			</div>
+			<?php
+			die();
+		}
+
+		$NiteowebSpiderBlocker_ins = new NiteowebSpiderBlocker;
+		register_activation_hook( __FILE__, array( &$NiteowebSpiderBlocker_ins, 'activatePlugin' ) );
+		register_deactivation_hook( __FILE__, array( &$NiteowebSpiderBlocker_ins, 'removeBlockRules' ) );
 	}
 
 

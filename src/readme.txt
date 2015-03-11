@@ -14,9 +14,9 @@ using Apache .htaccess file to minimize impact on your website. It will also hid
 with Apache server and mod_rewrite enabled.
 
 = Plugin Features =
-* **Block Unlimited bots from viewing your site**
-* **Easy Export/Import rules (comes with most common list of bots)**
-* **Zero Footprint**
+* Block Unlimited bots from viewing your site
+* Easy Export/Import rules (comes with most common list of bots)
+* Zero Footprint
 
 == Installation ==
 

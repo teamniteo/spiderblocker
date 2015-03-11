@@ -69,6 +69,12 @@
 					"index.php%{REQUEST_URI}"
 				)
 			);
+			$wp_rewrite->shouldReceive( 'add_external_rule' )->withArgs(
+				array(
+					"wp-content/plugins/spider_blocker/readme.txt",
+					"index.php%{REQUEST_URI}"
+				)
+			);
 
 			$plugin = new NiteowebSpiderBlocker;
 			$plugin->generateRewriteRules();
@@ -103,7 +109,7 @@
 
 			\WP_Mock::wpFunction( 'maybe_unserialize', array(
 					'called' => 1,
-					'return' => json_decode(json_encode(array(
+					'return' => json_decode( json_encode( array(
 						array(
 							'name'  => 'True Bot',
 							're'    => 'TrueBot',
@@ -116,7 +122,7 @@
 							'desc'  => 'False',
 							'state' => false,
 						)
-					),false)),
+					), false ) ),
 				)
 			);
 
@@ -125,7 +131,7 @@
 				)
 			);
 
-			$plugin->generateBlockRules( );
+			$plugin->generateBlockRules();
 			$this->assertEquals( $plugin->getRules(), array(
 				'SetEnvIfNoCase User-Agent "TrueBot" block_bot',
 				'<Limit GET POST HEAD>',
@@ -384,6 +390,7 @@
 			$plugin->saveList();
 
 		}
+
 		public function test_ajax_update_list_invalid() {
 			$plugin = new NiteowebSpiderBlocker;
 
@@ -416,7 +423,61 @@
 				)
 			);
 
-			$plugin->generateBlockRules( null );
+			$plugin->generateBlockRules();
+		}
+
+		public function test_remove_rules_generation() {
+			global $wp_rewrite;
+			$wp_rewrite = \Mockery::mock();
+			$wp_rewrite->shouldReceive( 'flush_rules' )->once();
+
+			$plugin = new NiteowebSpiderBlocker;
+
+			\WP_Mock::wpFunction( 'is_admin', array(
+					'return' => true,
+				)
+			);
+
+			\WP_Mock::wpFunction( 'get_home_path', array(
+					'return' => '/tmp/',
+				)
+			);
+			\WP_Mock::wpFunction( 'insert_with_markers', array(
+					'called' => 1,
+					'args'   => array(
+						'/tmp/.htaccess',
+						'NiteowebSpiderBlocker',
+						'*'
+					)
+				)
+			);
+
+			\WP_Mock::wpFunction( 'maybe_unserialize', array(
+					'called' => 1,
+					'return' => json_decode( json_encode( array(
+						array(
+							'name'  => 'True Bot',
+							're'    => 'TrueBot',
+							'desc'  => 'True',
+							'state' => true,
+						),
+						array(
+							'name'  => 'False Bot',
+							're'    => 'FalseBot',
+							'desc'  => 'False',
+							'state' => false,
+						)
+					), false ) ),
+				)
+			);
+
+			\WP_Mock::wpFunction( 'get_option', array(
+					'called' => 1,
+				)
+			);
+
+			$plugin->removeBlockRules();
+
 		}
 
 	}

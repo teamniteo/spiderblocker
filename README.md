@@ -1,5 +1,8 @@
 # SpiderBlocker
 
+[![Build Status](https://travis-ci.org/niteoweb/spiderblocker.svg?branch=master)](https://travis-ci.org/niteoweb/spiderblocker)
+[![Coverage Status](https://coveralls.io/repos/niteoweb/spiderblocker/badge.svg)](https://coveralls.io/r/niteoweb/spiderblocker)
+
 ## Plugin Name
 
 Contributors: niteoweb
@@ -26,9 +29,3 @@ with Apache server and mod_rewrite enabled.
 1. Upload 'spider-blocker' directory to the '/wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to **Tools** menu and then **SpiderBlocker* to configure
-
-## Status
-
-[![Build Status](https://travis-ci.org/niteoweb/spiderblocker.svg?branch=master)](https://travis-ci.org/niteoweb/spiderblocker)
-[![Coverage Status](https://coveralls.io/repos/niteoweb/spiderblocker/badge.svg)](https://coveralls.io/r/niteoweb/spiderblocker)
-
