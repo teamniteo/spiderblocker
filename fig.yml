@@ -3,7 +3,7 @@ web:
   ports:
    - 80:80
   volumes:
-   - ./src:/var/www/html/wp-content/plugins/spider_block:ro
+   - ./src:/var/www/html/wp-content/plugins/spider_blocker:ro
   links:
    - mysql
 mysql:
