@@ -1,9 +1,9 @@
 <?php
-
+	namespace Niteoweb\SpiderBlocker;
 	/**
 	 * Plugin Name: Spider Blocker
 	 * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
-	 * Version:     1.0.1
+	 * Version:     1.0.2
 	 * Author:      NiteoWeb Ltd.
 	 * Author URI:  www.niteoweb.com
 	 */
@@ -18,7 +18,66 @@
 		die();
 	}
 
-	class NiteowebSpiderBlocker {
+
+	class Updater {
+		public $current_version;
+		public $plugin_slug;
+		public $slug;
+		private $update_url = 'https://api.github.com/repos/niteoweb/spiderblocker/releases/latest';
+
+		function __construct() {
+			$plugin_info = get_plugin_data( __FILE__, false );
+			// Set the class public variables
+			$this->current_version = $plugin_info["Version"];
+			$this->plugin_slug     = plugin_basename( __FILE__ );
+			$this->slug = str_replace( '.php', '', $this->plugin_slug );
+
+			// define the alternative API for updating checking
+			add_filter( 'pre_set_site_transient_update_plugins', array( &$this, 'checkUpdate' ) );
+		}
+
+		/**
+		 * @codeCoverageIgnore
+		 */
+		public static function activate() {
+			new Updater();
+		}
+
+		public function checkUpdate( $transient ) {
+			if ( empty( $transient->checked ) ) {
+				return $transient;
+			}
+
+			// Get the remote version
+			$remote_version = $this->getRemoteInformation();
+			if ( $remote_version ) {
+				$version = str_replace( 'v', '', $remote_version->tag_name );
+				// If a newer version is available, add the update
+				if ( version_compare( $this->current_version, $version, '<' ) ) {
+					$obj                                       = new \stdClass();
+					$obj->slug                                 = $this->slug;
+					$obj->new_version                          = $version;
+					$obj->url                                  = $this->update_url;
+					$obj->package                              = $remote_version->assets[0]->browser_download_url;
+					$transient->response[ $this->plugin_slug ] = $obj;
+				}
+			}
+
+			return $transient;
+		}
+
+		public function getRemoteInformation() {
+			$request = wp_remote_get( $this->update_url );
+			if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
+				return json_decode( $request['body'], false );
+			}
+
+			return false;
+		}
+
+	}
+
+	class SpiderBlocker {
 
 		public $default_bots = 'a:35:{i:0;O:8:"stdClass":4:{s:4:"name";s:10:"Ahrefs Bot";s:2:"re";s:9:"AhrefsBot";s:4:"desc";s:25:"https://ahrefs.com/robot/";s:5:"state";b:1;}i:1;O:8:"stdClass":4:{s:4:"name";s:8:"MJ12 bot";s:2:"re";s:7:"MJ12bot";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:2;O:8:"stdClass":4:{s:4:"name";s:9:"Roger Bot";s:2:"re";s:8:"Rogerbot";s:4:"desc";s:40:"http://moz.com/help/pro/rogerbot-crawler";s:5:"state";b:1;}i:3;O:8:"stdClass":4:{s:4:"name";s:11:"Semrush Bot";s:2:"re";s:10:"SemrushBot";s:4:"desc";s:31:"http://www.semrush.com/bot.html";s:5:"state";b:1;}i:4;O:8:"stdClass":4:{s:4:"name";s:11:"ia_archiver";s:2:"re";s:11:"ia_archiver";s:4:"desc";s:36:"http://archive.org/about/exclude.php";s:5:"state";b:1;}i:5;O:8:"stdClass":4:{s:4:"name";s:8:"ScoutJet";s:2:"re";s:8:"ScoutJet";s:4:"desc";s:19:"http://scoutjet.com";s:5:"state";b:1;}i:6;O:8:"stdClass":4:{s:4:"name";s:7:"sistrix";s:2:"re";s:7:"sistrix";s:4:"desc";s:26:"http://crawler.sistrix.net";s:5:"state";b:1;}i:7;O:8:"stdClass":4:{s:4:"name";s:16:"SearchmetricsBot";s:2:"re";s:16:"SearchmetricsBot";s:4:"desc";s:50:"http://www.searchmetrics.com/en/searchmetrics-bot/";s:5:"state";b:1;}i:8;O:8:"stdClass":4:{s:4:"name";s:14:"SEOkicks-Robot";s:2:"re";s:14:"SEOkicks-Robot";s:4:"desc";s:33:"http://www.seokicks.de/robot.html";s:5:"state";b:1;}i:9;O:8:"stdClass":4:{s:4:"name";s:16:"Lipperhey Spider";s:2:"re";s:16:"Lipperhey Spider";s:4:"desc";s:43:"http://www.lipperhey.com/en/website-spider/";s:5:"state";b:1;}i:10;O:8:"stdClass":4:{s:4:"name";s:6:"Exabot";s:2:"re";s:6:"Exabot";s:4:"desc";s:44:"http://www.exalead.com/search/webmasterguide";s:5:"state";b:1;}i:11;O:8:"stdClass":4:{s:4:"name";s:6:"NC Bot";s:2:"re";s:5:"NCBot";s:4:"desc";s:55:"https://twitter.com/NetComber/status/334476871691550721";s:5:"state";b:1;}i:12;O:8:"stdClass":4:{s:4:"name";s:15:"BacklinkCrawler";s:2:"re";s:15:"BacklinkCrawler";s:4:"desc";s:40:"http://www.backlinktest.com/crawler.html";s:5:"state";b:1;}i:13;O:8:"stdClass":4:{s:4:"name";s:15:"archive.org Bot";s:2:"re";s:15:"archive.org_bot";s:4:"desc";s:42:"http://archive.org/details/archive.org_bot";s:5:"state";b:1;}i:14;O:8:"stdClass":4:{s:4:"name";s:12:"MeanPath Bot";s:2:"re";s:11:"meanpathbot";s:4:"desc";s:37:"https://meanpath.com/meanpathbot.html";s:5:"state";b:1;}i:15;O:8:"stdClass":4:{s:4:"name";s:18:"PagesInventory Bot";s:2:"re";s:14:"PagesInventory";s:4:"desc";s:56:"http://www.botsvsbrowsers.com/details/1002332/index.html";s:5:"state";b:1;}i:16;O:8:"stdClass":4:{s:4:"name";s:12:"Aboundex Bot";s:2:"re";s:11:"Aboundexbot";s:4:"desc";s:32:"http://www.aboundex.com/crawler/";s:5:"state";b:1;}i:17;O:8:"stdClass":4:{s:4:"name";s:15:"SeoProfiler Bot";s:2:"re";s:5:"spbot";s:4:"desc";s:31:"http://www.seoprofiler.com/bot/";s:5:"state";b:1;}i:18;O:8:"stdClass":4:{s:4:"name";s:11:"Linkdex Bot";s:2:"re";s:10:"linkdexbot";s:4:"desc";s:34:"http://www.linkdex.com/about/bots/";s:5:"state";b:1;}i:19;O:8:"stdClass":4:{s:4:"name";s:7:"Gigabot";s:2:"re";s:7:"Gigabot";s:4:"desc";s:45:"http://www.useragentstring.com/pages/Gigabot/";s:5:"state";b:1;}i:20;O:8:"stdClass":4:{s:4:"name";s:6:"DotBot";s:2:"re";s:6:"dotbot";s:4:"desc";s:35:"http://en.wikipedia.org/wiki/DotBot";s:5:"state";b:1;}i:21;O:8:"stdClass":4:{s:4:"name";s:5:"Nutch";s:2:"re";s:5:"Nutch";s:4:"desc";s:32:"http://nutch.apache.org/bot.html";s:5:"state";b:1;}i:22;O:8:"stdClass":4:{s:4:"name";s:8:"BLEX Bot";s:2:"re";s:7:"BLEXBot";s:4:"desc";s:27:"http://webmeup-crawler.com/";s:5:"state";b:1;}i:23;O:8:"stdClass":4:{s:4:"name";s:6:"Ezooms";s:2:"re";s:6:"Ezooms";s:4:"desc";s:49:"http://graphicline.co.za/blogs/what-is-ezooms-bot";s:5:"state";b:1;}i:24;O:8:"stdClass":4:{s:4:"name";s:11:"Majestic 12";s:2:"re";s:11:"Majestic-12";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:25;O:8:"stdClass":4:{s:4:"name";s:12:"Majestic SEO";s:2:"re";s:12:"Majestic-SEO";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:26;O:8:"stdClass":4:{s:4:"name";s:7:"DSearch";s:2:"re";s:7:"DSearch";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:27;O:8:"stdClass":4:{s:4:"name";s:10:"Blekko Bot";s:2:"re";s:9:"BlekkoBot";s:4:"desc";s:33:"http://blekko.com/about/blekkobot";s:5:"state";b:1;}i:28;O:8:"stdClass":4:{s:4:"name";s:6:"Yandex";s:2:"re";s:6:"Yandex";s:4:"desc";s:41:"http://help.yandex.com/search/?id=1112030";s:5:"state";b:0;}i:29;O:8:"stdClass":4:{s:4:"name";s:10:"Google Bot";s:2:"re";s:9:"googlebot";s:4:"desc";s:57:"https://support.google.com/webmasters/answer/182072?hl=en";s:5:"state";b:0;}i:30;O:8:"stdClass":4:{s:4:"name";s:18:"Feedfetcher Google";s:2:"re";s:18:"Feedfetcher-Google";s:4:"desc";s:51:"https://support.google.com/webmasters/answer/178852";s:5:"state";b:0;}i:31;O:8:"stdClass":4:{s:4:"name";s:8:"Bing Bot";s:2:"re";s:7:"BingBot";s:4:"desc";s:36:"http://en.wikipedia.org/wiki/Bingbot";s:5:"state";b:0;}i:32;O:8:"stdClass":4:{s:4:"name";s:9:"Nerdy Bot";s:2:"re";s:8:"NerdyBot";s:4:"desc";s:20:"http://nerdybot.com/";s:5:"state";b:1;}i:33;O:8:"stdClass":4:{s:4:"name";s:9:"James BOT";s:2:"re";s:8:"JamesBOT";s:4:"desc";s:32:"http://cognitiveseo.com/bot.html";s:5:"state";b:1;}i:34;O:8:"stdClass":4:{s:4:"name";s:7:"Tin Eye";s:2:"re";s:6:"TinEye";s:4:"desc";s:34:"http://www.tineye.com/crawler.html";s:5:"state";b:1;}}';
 		protected $option_name = 'Niteoweb.SpiderBlocker.Bots';
@@ -442,7 +501,7 @@
 
 	// Inside WordPress
 	if ( defined( 'ABSPATH' ) ) {
-		if ( ! apache_get_version() || ! NiteowebSpiderBlocker::modRewriteEnabled() ) {
+		if ( ! apache_get_version() || ! SpiderBlocker::modRewriteEnabled() ) {
 			?>
 			<div id="error-page">
 				<p>This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider
@@ -454,7 +513,7 @@
 			die();
 		}
 
-		if ( ! NiteowebSpiderBlocker::isHtaccessWritable() ) {
+		if ( ! SpiderBlocker::isHtaccessWritable() ) {
 			?>
 			<div id="error-page">
 				<p>This plugin requires <b>.htaccess</b> file that is writable by the server. Please enable write access
@@ -464,9 +523,11 @@
 			die();
 		}
 
-		$NiteowebSpiderBlocker_ins = new NiteowebSpiderBlocker;
+		$NiteowebSpiderBlocker_ins = new SpiderBlocker;
 		register_activation_hook( __FILE__, array( &$NiteowebSpiderBlocker_ins, 'activatePlugin' ) );
 		register_deactivation_hook( __FILE__, array( &$NiteowebSpiderBlocker_ins, 'removeBlockRules' ) );
+		add_action( 'admin_init', array( 'Niteoweb\SpiderBlocker\Updater', 'activate' ) );
+
 	}
 
 
