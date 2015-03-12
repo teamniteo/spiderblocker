@@ -1,6 +1,8 @@
 language: php
 secure: amBIQvCiCh/DsyOUTLXkMQ4EGj0TIRKyAb/qwIGKTIT3MEmXbUfnP5AXT3rRXmbtVc9oBUmpZmckPfooOOwv6AdC4w6qvjux2WXzsMPgDXt/IhoaxJaNFBKdkln90arWHclJbUs2XHhkGte+SI5sweOYK92Ida9d97nqwMZQGNk=
 sudo: false
+matrix:
+  fast_finish: true
 cache:
 - vendor
 - bin

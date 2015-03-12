@@ -1,6 +1,8 @@
 <?php
 
-	class TestExport extends PHPUnit_Framework_TestCase {
+	use Niteoweb\SpiderBlocker\SpiderBlocker;
+
+	class TestBlocker extends PHPUnit_Framework_TestCase {
 
 		function setUp() {
 			\WP_Mock::setUsePatchwork( true );
@@ -17,7 +19,7 @@
 				)
 			);
 
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 			\WP_Mock::expectActionAdded( 'admin_menu', array( $plugin, 'adminMenu' ) );
 			\WP_Mock::expectActionAdded( 'wp_ajax_NSB-get_list', array( $plugin, 'loadList' ) );
@@ -35,7 +37,7 @@
 				)
 			);
 
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 			\WP_Mock::expectActionAdded( 'generate_rewrite_rules', array( $plugin, 'generateRewriteRules' ) );
 
@@ -49,7 +51,7 @@
 					'args'   => array( 'SpiderBlocker', 'SpiderBlocker', 'manage_options', 'ni_spider_block', '*' ),
 				)
 			);
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 			$plugin->adminMenu();
 
 		}
@@ -76,7 +78,7 @@
 				)
 			);
 
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 			$plugin->generateRewriteRules();
 
 		}
@@ -86,7 +88,7 @@
 			$wp_rewrite = \Mockery::mock();
 			$wp_rewrite->shouldReceive( 'flush_rules' )->once();
 
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 			\WP_Mock::wpFunction( 'is_admin', array(
 					'return' => true,
@@ -144,7 +146,7 @@
 		}
 
 		public function test_ajax_get_list() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 
 			\WP_Mock::wpFunction( 'check_ajax_referer', array(
@@ -191,7 +193,7 @@
 
 
 		public function test_ajax_reset_list() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 
 			\WP_Mock::wpFunction( 'check_ajax_referer', array(
@@ -244,7 +246,7 @@
 		}
 
 		public function test_ajax_save_list() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 
 			\WP_Mock::wpFunction( 'check_ajax_referer', array(
@@ -315,7 +317,7 @@
 		}
 
 		public function test_ajax_update_list() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 
 			\WP_Mock::wpFunction( 'check_ajax_referer', array(
@@ -392,7 +394,7 @@
 		}
 
 		public function test_ajax_update_list_invalid() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 
 			\WP_Mock::wpFunction( 'check_ajax_referer', array(
@@ -416,7 +418,7 @@
 		}
 
 		public function test_skip_rules_generation() {
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 			\WP_Mock::wpFunction( 'get_home_path', array(
 					'return' => '/not_here/',
@@ -431,7 +433,7 @@
 			$wp_rewrite = \Mockery::mock();
 			$wp_rewrite->shouldReceive( 'flush_rules' )->once();
 
-			$plugin = new NiteowebSpiderBlocker;
+			$plugin = new SpiderBlocker;
 
 			\WP_Mock::wpFunction( 'is_admin', array(
 					'return' => true,
