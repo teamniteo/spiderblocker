@@ -1,4 +1,7 @@
-VERSION := 1.0.2
+VERSION := 1.0.3
+
+test:
+	bin/phpunit
 
 release:
 	cp -ar src spider_blocker
