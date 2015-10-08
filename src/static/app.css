@@ -1,0 +1,13 @@
+.notice.fixed {
+    position: fixed;
+    right: 1em;
+    top: 3.5em;
+}
+
+tr.active {
+    background-color: rgba(54, 204, 255, 0.05);
+}
+
+.active th.bot-re {
+    border-left: 4px solid #2ea2cc;
+}

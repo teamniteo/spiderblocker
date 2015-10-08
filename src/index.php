@@ -3,7 +3,8 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.3
+ * Version:     1.0.4
+ * Runtime:     5.3
  * Author:      NiteoWeb Ltd.
  * Author URI:  www.niteoweb.com
  */
@@ -18,69 +19,6 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     die();
 }
 
-
-class Updater
-{
-    public $current_version;
-    public $plugin_slug;
-    public $slug;
-    private $update_url = 'https://api.github.com/repos/niteoweb/spiderblocker/releases/latest';
-
-    function __construct()
-    {
-        $plugin_info = get_plugin_data(__FILE__, false);
-        // Set the class public variables
-        $this->current_version = $plugin_info["Version"];
-        $this->plugin_slug = plugin_basename(__FILE__);
-        $this->slug = str_replace('.php', '', $this->plugin_slug);
-
-        // define the alternative API for updating checking
-        add_filter('pre_set_site_transient_update_plugins', array(&$this, 'checkUpdate'));
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function activate()
-    {
-        new Updater();
-    }
-
-    public function checkUpdate($transient)
-    {
-        if (empty($transient->checked)) {
-            return $transient;
-        }
-
-        // Get the remote version
-        $remote_version = $this->getRemoteInformation();
-        if ($remote_version) {
-            $version = str_replace('v', '', $remote_version->tag_name);
-            // If a newer version is available, add the update
-            if (version_compare($this->current_version, $version, '<')) {
-                $obj = new \stdClass();
-                $obj->slug = $this->slug;
-                $obj->new_version = $version;
-                $obj->url = $this->update_url;
-                $obj->package = $remote_version->assets[0]->browser_download_url;
-                $transient->response[$this->plugin_slug] = $obj;
-            }
-        }
-
-        return $transient;
-    }
-
-    public function getRemoteInformation()
-    {
-        $request = wp_remote_get($this->update_url);
-        if (!is_wp_error($request) || wp_remote_retrieve_response_code($request) === 200) {
-            return json_decode($request['body'], false);
-        }
-
-        return false;
-    }
-
-}
 
 class SpiderBlocker
 {
@@ -99,6 +37,7 @@ class SpiderBlocker
             add_action('wp_ajax_NSB-reset_list', array(&$this, 'resetList'));
         }
         add_action('generate_rewrite_rules', array(&$this, "generateRewriteRules"));
+
     }
 
     /**
@@ -305,24 +244,15 @@ class SpiderBlocker
      */
     function viewHandler()
     {
+
         add_thickbox();
+        wp_enqueue_script( 'spider_blocker_angularjs', plugin_dir_url( __FILE__ ) . 'static/angular.js' );
+        wp_enqueue_script( 'spider_blocker_app', plugin_dir_url( __FILE__ ) . 'static/app.js' );
+        wp_enqueue_style( 'spider_blocker_app', plugin_dir_url( __FILE__ ) . 'static/app.css' );
         ?>
-        <style>
-            .notice.fixed {
-                position: fixed;
-                right: 1em;
-                top: 3.5em;
-            }
-
-            tr.active {
-                background-color: rgba(54, 204, 255, 0.05);
-            }
-
-            .active th.bot-re {
-                border-left: 4px solid #2ea2cc;
-            }
-        </style>
-
+        <script>
+            window.sb_nonce="<?php echo wp_create_nonce($this->nonce); ?>";
+        </script>
         <h1>Spider Blocker</h1>
         <hr/>
         <div ng-app="spiderBlockApp">
@@ -437,124 +367,6 @@ class SpiderBlocker
                 </p>
 
             </div>
-
-            <script type="text/javascript"
-                    src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
-            <script type="text/javascript"
-                    src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular-aria.min.js"></script>
-            <script type="text/javascript">
-                -(function () {
-                    var spiderBlockApp = angular.module('spiderBlockApp', ['ngAria']);
-
-                    spiderBlockApp.directive('jsonText', function () {
-                        return {
-                            restrict: 'A',
-                            require: 'ngModel',
-                            link: function (scope, element, attr, ngModel) {
-                                function into(input) {
-                                    return angular.fromJson(input);
-                                }
-
-                                function out(data) {
-                                    return angular.toJson(data, true);
-                                }
-
-                                ngModel.$parsers.push(into);
-                                ngModel.$formatters.push(out);
-                            }
-                        };
-                    });
-                    spiderBlockApp.controller('NotificationsCtrl', function ($scope, $rootScope, $timeout) {
-                        $scope.notifications = [];
-
-                        $rootScope.$on('notification', function (event, data) {
-                            $scope.notifications.push(data);
-                            $timeout(function () {
-                                $scope.removeNotification(data);
-                            }, 3000);
-                        });
-
-                        $scope.removeNotification = function (notification) {
-                            var index;
-                            if ($scope.notifications !== undefined) {
-                                index = $scope.notifications.indexOf(notification);
-                                $scope.notifications.splice(index, 1);
-                            }
-                        }
-                    });
-                    spiderBlockApp.controller('BotListCtrl', function ($scope, $http, $rootScope) {
-                        var wp_ajax = function (_req) {
-                            _req.nonce = '<?php echo wp_create_nonce($this->nonce); ?>';
-                            return $http({
-                                method: 'POST',
-                                url: ajaxurl,
-                                data: jQuery.param(_req),
-                                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-                            })
-                        };
-
-                        var find_bot = function (re) {
-                            for (var i = $scope.bots.length - 1; i >= 0; i--) {
-                                if ($scope.bots[i]['re'] == re) {
-                                    return i;
-                                }
-                            }
-                            return null;
-                        };
-
-                        $scope.bot = {"state": true};
-
-                        wp_ajax({
-                            action: 'NSB-get_list'
-                        }).success(function (res) {
-                            $scope.bots = res.data;
-                        });
-
-                        $scope.save = function () {
-                            wp_ajax({
-                                action: 'NSB-set_list',
-                                data: angular.toJson($scope.bots)
-                            }).success(function (res) {
-                                if (res.success) {
-                                    $scope.bots = res.data;
-                                    $rootScope.$emit('notification', {
-                                        state: 'success',
-                                        msg: 'List of bots was saved and new blocklist applied!'
-                                    });
-                                } else {
-                                    $rootScope.$emit('notification', {state: 'errror', msg: res.data});
-                                }
-                            });
-                        };
-
-                        $scope.reset = function () {
-                            wp_ajax({
-                                action: 'NSB-reset_list'
-                            }).success(function (res) {
-                                $scope.bots = res.data;
-                                $rootScope.$emit('notification', {
-                                    state: 'success',
-                                    msg: 'List of bots was reset to defaults!'
-                                });
-                            });
-                        };
-
-                        $scope.add = function () {
-                            $scope.bots.push($scope.bot);
-                            $rootScope.$emit('notification', {
-                                state: 'success',
-                                msg: 'Bot ' + $scope.bot.name + ' was added!'
-                            });
-                            $scope.bot = {"state": true};
-                        };
-
-                        $scope.remove = function (at) {
-                            $rootScope.$emit('notification', {state: 'success', msg: 'Bot was removed!'});
-                            $scope.bots.splice(find_bot(at), 1);
-                        };
-                    });
-                })(angular, document, jQuery);
-            </script>
         </div>
         <?php
     }
@@ -565,5 +377,4 @@ if (defined('ABSPATH')) {
     $NiteowebSpiderBlocker_ins = new SpiderBlocker;
     register_activation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'activatePlugin'));
     register_deactivation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'removeBlockRules'));
-    add_action('admin_init', array('Niteoweb\SpiderBlocker\Updater', 'activate'));
 }
