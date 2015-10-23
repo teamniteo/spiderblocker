@@ -18,8 +18,3 @@ before_script:
 script: bin/phpunit
 after_script:
 - bin/coveralls -v
-after_success:
-- wget "https://github.com/aktau/github-release/releases/download/v0.5.3/linux-amd64-github-release.tar.bz2"
-- tar xvf linux-amd64-github-release.tar.bz2
-- make release
-- make deploy
