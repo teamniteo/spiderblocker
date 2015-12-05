@@ -3,11 +3,21 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.4
+ * Version:     1.0.5
  * Runtime:     5.3
  * Author:      NiteoWeb Ltd.
  * Author URI:  www.niteoweb.com
  */
+
+if (!function_exists('apache_get_version')) {
+  function apache_get_version()
+  {
+    if (stristr($_ENV["SERVER_SOFTWARE"], 'Apache')) {
+      return $_ENV["SERVER_SOFTWARE"];
+    }
+    return false;
+  }
+}
 
 if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     ?>
@@ -106,7 +116,7 @@ class SpiderBlocker
      */
     function activatePlugin()
     {
-        if (!apache_get_version() || !SpiderBlocker::modRewriteEnabled()) {
+        if (!apache_get_version()) {
             ?>
             <div id="error-page">
                 <p>This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider
@@ -143,17 +153,10 @@ class SpiderBlocker
         $htaccess_file = $home_path . '.htaccess';
 
         if ((!file_exists($htaccess_file) && is_writable($home_path)) || is_writable($htaccess_file)) {
-            if ($this->modRewriteEnabled()) {
-                insert_with_markers($htaccess_file, 'NiteowebSpiderBlocker', $this->getRules());
-            }
+          insert_with_markers($htaccess_file, 'NiteowebSpiderBlocker', $this->getRules());
         }
 
         $wp_rewrite->flush_rules();
-    }
-
-    static function modRewriteEnabled()
-    {
-        return function_exists('apache_mod_loaded') ? apache_mod_loaded('mod_rewrite', false) : false;
     }
 
     /**
@@ -206,9 +209,7 @@ class SpiderBlocker
         $htaccess_file = $home_path . '.htaccess';
         $empty = array();
         if ((!file_exists($htaccess_file) && is_writable($home_path)) || is_writable($htaccess_file)) {
-            if ($this->modRewriteEnabled()) {
-                insert_with_markers($htaccess_file, 'NiteowebSpiderBlocker', $empty);
-            }
+            insert_with_markers($htaccess_file, 'NiteowebSpiderBlocker', $empty);
         }
 
         $wp_rewrite->flush_rules();
