@@ -5,8 +5,8 @@ namespace Niteoweb\SpiderBlocker;
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
  * Version:     1.0.5
  * Runtime:     5.3
- * Author:      NiteoWeb Ltd.
- * Author URI:  www.niteoweb.com
+ * Author:      Easy Blog Networks
+ * Author URI:  www.easyblognetworks.com
  */
 
 if (!function_exists('apache_get_version')) {
