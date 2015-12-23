@@ -3,7 +3,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.6
+ * Version:     1.0.9
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Author URI:  www.easyblognetworks.com
