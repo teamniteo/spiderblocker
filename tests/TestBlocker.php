@@ -57,7 +57,19 @@
 		}
 
 		public function test_generate_rewrite_rules() {
+
 			global $wp_rewrite;
+
+			\WP_Mock::wpFunction( 'wp_make_link_relative', array(
+							'return' => '/wp-content/plugins/spider_blocker/',
+					)
+			);
+
+			\WP_Mock::wpFunction( 'plugin_dir_url', array(
+							'return' => 'http://localhost/wp-content/plugins/spider_blocker/',
+					)
+			);
+
 			$wp_rewrite = \Mockery::mock();
 			$wp_rewrite->shouldReceive( 'add_external_rule' )->withArgs(
 				array(
