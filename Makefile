@@ -1,4 +1,4 @@
-VERSION := 1.0.9
+VERSION := 1.0.10
 PLUGINSLUG := spiderblocker
 MAINFILE := index.php
 SRCPATH := $(shell pwd)/src
@@ -8,6 +8,7 @@ test:
 	bin/phpunit
 
 release:
+	mkdir -p build
 	cp -ar src $(PLUGINSLUG)
 	zip -r $(PLUGINSLUG).zip $(PLUGINSLUG)
 	rm -rf $(PLUGINSLUG)
