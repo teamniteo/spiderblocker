@@ -1,15 +1,25 @@
-web:
+app:
   image: dz0ny/wpbox
-  ports:
-   - 80:80
-  volumes:
-   - ./src:/var/www/html/wp-content/plugins/spider_blocker:ro
   links:
-   - mysql
-mysql:
-  image: mysql
+    - db:mysql
+  ports:
+    - 80:80
+  volumes:
+   - ./src:/var/www/html/wp-content/plugins/spiderblocker:ro
+
+db:
+  image: mariadb
   ports:
     - 3306
   environment:
     MYSQL_DATABASE: wordpress
     MYSQL_ROOT_PASSWORD: wordpress
+
+phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  links:
+    - db:db
+  environment:
+   - PMA_ARBITRARY=1
+  ports:
+    - 81:80
