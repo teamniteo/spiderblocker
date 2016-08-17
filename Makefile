@@ -1,4 +1,4 @@
-VERSION := 1.0.11
+VERSION := 1.0.13
 PLUGINSLUG := spiderblocker
 MAINFILE := index.php
 SRCPATH := $(shell pwd)/src

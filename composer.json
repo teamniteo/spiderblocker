@@ -20,16 +20,16 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "http://wpackagist.org"
+            "url": "https://wpackagist.org"
         },
         {
             "type": "package",
             "package": {
                 "name": "wordpress",
-                "version": "4.1",
+                "version": "4.6",
                 "type": "wordpress-plugin",
                 "dist": {
-                    "url": "http://wordpress.org/wordpress-4.1.zip",
+                    "url": "https://wordpress.org/wordpress-4.6.zip",
                     "type": "zip"
                 }
             }
