@@ -35,38 +35,6 @@ class TestBlocker extends PHPUnit_Framework_TestCase
         \WP_Mock::expectActionAdded('wp_ajax_NSB-set_list', array($plugin, 'saveList'));
         \WP_Mock::expectActionAdded('wp_ajax_NSB-reset_list', array($plugin, 'resetList'));
         \WP_Mock::expectActionAdded('generate_rewrite_rules', array($plugin, 'generateRewriteRules'));
-        \WP_Mock::expectActionAdded('Niteoweb.SpiderBlocker.CheckHook', array($plugin, 'htaccessCheckHook'));
-
-        $plugin->__construct();
-        \WP_Mock::assertHooksAdded();
-    }
-
-    public function test_init_cron_schedule()
-    {
-        \WP_Mock::wpFunction('is_admin', array(
-                'return' => true,
-            )
-        );
-
-        \WP_Mock::wpFunction('wp_next_scheduled', array(
-                'return' => false,
-            )
-        );
-
-        \WP_Mock::wpFunction('wp_schedule_event', array(
-                'called' => 1,
-                'return' => false,
-            )
-        );
-
-        $plugin = new SpiderBlocker;
-
-        \WP_Mock::expectActionAdded('admin_menu', array($plugin, 'adminMenu'));
-        \WP_Mock::expectActionAdded('wp_ajax_NSB-get_list', array($plugin, 'loadList'));
-        \WP_Mock::expectActionAdded('wp_ajax_NSB-set_list', array($plugin, 'saveList'));
-        \WP_Mock::expectActionAdded('wp_ajax_NSB-reset_list', array($plugin, 'resetList'));
-        \WP_Mock::expectActionAdded('generate_rewrite_rules', array($plugin, 'generateRewriteRules'));
-        \WP_Mock::expectActionAdded('Niteoweb.SpiderBlocker.CheckHook', array($plugin, 'htaccessCheckHook'));
 
         $plugin->__construct();
         \WP_Mock::assertHooksAdded();

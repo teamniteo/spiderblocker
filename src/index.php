@@ -3,7 +3,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.13
+ * Version:     1.0.14
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Author URI:  www.easyblognetworks.com
@@ -36,10 +36,239 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 class SpiderBlocker
 {
 
-    public $default_bots = 'a:36:{i:0;O:8:"stdClass":4:{s:4:"name";s:10:"Ahrefs Bot";s:2:"re";s:9:"AhrefsBot";s:4:"desc";s:25:"https://ahrefs.com/robot/";s:5:"state";b:1;}i:1;O:8:"stdClass":4:{s:4:"name";s:8:"MJ12 bot";s:2:"re";s:7:"MJ12bot";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:2;O:8:"stdClass":4:{s:4:"name";s:9:"Roger Bot";s:2:"re";s:8:"Rogerbot";s:4:"desc";s:40:"http://moz.com/help/pro/rogerbot-crawler";s:5:"state";b:1;}i:3;O:8:"stdClass":4:{s:4:"name";s:11:"Semrush Bot";s:2:"re";s:10:"SemrushBot";s:4:"desc";s:31:"http://www.semrush.com/bot.html";s:5:"state";b:1;}i:4;O:8:"stdClass":4:{s:4:"name";s:11:"ia_archiver";s:2:"re";s:11:"ia_archiver";s:4:"desc";s:36:"http://archive.org/about/exclude.php";s:5:"state";b:1;}i:5;O:8:"stdClass":4:{s:4:"name";s:8:"ScoutJet";s:2:"re";s:8:"ScoutJet";s:4:"desc";s:19:"http://scoutjet.com";s:5:"state";b:1;}i:6;O:8:"stdClass":4:{s:4:"name";s:7:"sistrix";s:2:"re";s:7:"sistrix";s:4:"desc";s:26:"http://crawler.sistrix.net";s:5:"state";b:1;}i:7;O:8:"stdClass":4:{s:4:"name";s:16:"SearchmetricsBot";s:2:"re";s:16:"SearchmetricsBot";s:4:"desc";s:50:"http://www.searchmetrics.com/en/searchmetrics-bot/";s:5:"state";b:1;}i:8;O:8:"stdClass":4:{s:4:"name";s:14:"SEOkicks-Robot";s:2:"re";s:14:"SEOkicks-Robot";s:4:"desc";s:33:"http://www.seokicks.de/robot.html";s:5:"state";b:1;}i:9;O:8:"stdClass":4:{s:4:"name";s:16:"Lipperhey Spider";s:2:"re";s:16:"Lipperhey Spider";s:4:"desc";s:43:"http://www.lipperhey.com/en/website-spider/";s:5:"state";b:1;}i:10;O:8:"stdClass":4:{s:4:"name";s:6:"Exabot";s:2:"re";s:6:"Exabot";s:4:"desc";s:44:"http://www.exalead.com/search/webmasterguide";s:5:"state";b:1;}i:11;O:8:"stdClass":4:{s:4:"name";s:6:"NC Bot";s:2:"re";s:5:"NCBot";s:4:"desc";s:55:"https://twitter.com/NetComber/status/334476871691550721";s:5:"state";b:1;}i:12;O:8:"stdClass":4:{s:4:"name";s:15:"BacklinkCrawler";s:2:"re";s:15:"BacklinkCrawler";s:4:"desc";s:40:"http://www.backlinktest.com/crawler.html";s:5:"state";b:1;}i:13;O:8:"stdClass":4:{s:4:"name";s:15:"archive.org Bot";s:2:"re";s:15:"archive.org_bot";s:4:"desc";s:42:"http://archive.org/details/archive.org_bot";s:5:"state";b:1;}i:14;O:8:"stdClass":4:{s:4:"name";s:12:"MeanPath Bot";s:2:"re";s:11:"meanpathbot";s:4:"desc";s:37:"https://meanpath.com/meanpathbot.html";s:5:"state";b:1;}i:15;O:8:"stdClass":4:{s:4:"name";s:18:"PagesInventory Bot";s:2:"re";s:14:"PagesInventory";s:4:"desc";s:56:"http://www.botsvsbrowsers.com/details/1002332/index.html";s:5:"state";b:1;}i:16;O:8:"stdClass":4:{s:4:"name";s:12:"Aboundex Bot";s:2:"re";s:11:"Aboundexbot";s:4:"desc";s:32:"http://www.aboundex.com/crawler/";s:5:"state";b:1;}i:17;O:8:"stdClass":4:{s:4:"name";s:15:"SeoProfiler Bot";s:2:"re";s:5:"spbot";s:4:"desc";s:31:"http://www.seoprofiler.com/bot/";s:5:"state";b:1;}i:18;O:8:"stdClass":4:{s:4:"name";s:11:"Linkdex Bot";s:2:"re";s:10:"linkdexbot";s:4:"desc";s:34:"http://www.linkdex.com/about/bots/";s:5:"state";b:1;}i:19;O:8:"stdClass":4:{s:4:"name";s:7:"Gigabot";s:2:"re";s:7:"Gigabot";s:4:"desc";s:45:"http://www.useragentstring.com/pages/Gigabot/";s:5:"state";b:1;}i:20;O:8:"stdClass":4:{s:4:"name";s:6:"DotBot";s:2:"re";s:6:"dotbot";s:4:"desc";s:35:"http://en.wikipedia.org/wiki/DotBot";s:5:"state";b:1;}i:21;O:8:"stdClass":4:{s:4:"name";s:5:"Nutch";s:2:"re";s:5:"Nutch";s:4:"desc";s:32:"http://nutch.apache.org/bot.html";s:5:"state";b:1;}i:22;O:8:"stdClass":4:{s:4:"name";s:8:"BLEX Bot";s:2:"re";s:7:"BLEXBot";s:4:"desc";s:27:"http://webmeup-crawler.com/";s:5:"state";b:1;}i:23;O:8:"stdClass":4:{s:4:"name";s:6:"Ezooms";s:2:"re";s:6:"Ezooms";s:4:"desc";s:49:"http://graphicline.co.za/blogs/what-is-ezooms-bot";s:5:"state";b:1;}i:24;O:8:"stdClass":4:{s:4:"name";s:11:"Majestic 12";s:2:"re";s:11:"Majestic-12";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:25;O:8:"stdClass":4:{s:4:"name";s:12:"Majestic SEO";s:2:"re";s:12:"Majestic-SEO";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:26;O:8:"stdClass":4:{s:4:"name";s:7:"DSearch";s:2:"re";s:7:"DSearch";s:4:"desc";s:56:"http://www.majestic12.co.uk/projects/dsearch/mj12bot.php";s:5:"state";b:1;}i:27;O:8:"stdClass":4:{s:4:"name";s:10:"Blekko Bot";s:2:"re";s:9:"BlekkoBot";s:4:"desc";s:33:"http://blekko.com/about/blekkobot";s:5:"state";b:1;}i:28;O:8:"stdClass":4:{s:4:"name";s:6:"Yandex";s:2:"re";s:6:"Yandex";s:4:"desc";s:41:"http://help.yandex.com/search/?id=1112030";s:5:"state";b:0;}i:29;O:8:"stdClass":4:{s:4:"name";s:10:"Google Bot";s:2:"re";s:9:"googlebot";s:4:"desc";s:57:"https://support.google.com/webmasters/answer/182072?hl=en";s:5:"state";b:0;}i:30;O:8:"stdClass":4:{s:4:"name";s:18:"Feedfetcher Google";s:2:"re";s:18:"Feedfetcher-Google";s:4:"desc";s:51:"https://support.google.com/webmasters/answer/178852";s:5:"state";b:0;}i:31;O:8:"stdClass":4:{s:4:"name";s:8:"Bing Bot";s:2:"re";s:7:"BingBot";s:4:"desc";s:36:"http://en.wikipedia.org/wiki/Bingbot";s:5:"state";b:0;}i:32;O:8:"stdClass":4:{s:4:"name";s:9:"Nerdy Bot";s:2:"re";s:8:"NerdyBot";s:4:"desc";s:20:"http://nerdybot.com/";s:5:"state";b:1;}i:33;O:8:"stdClass":4:{s:4:"name";s:9:"James BOT";s:2:"re";s:8:"JamesBOT";s:4:"desc";s:32:"http://cognitiveseo.com/bot.html";s:5:"state";b:1;}i:34;O:8:"stdClass":4:{s:4:"name";s:7:"Tin Eye";s:2:"re";s:6:"TinEye";s:4:"desc";s:34:"http://www.tineye.com/crawler.html";s:5:"state";b:1;}i:35;O:8:"stdClass":4:{s:5:"state";b:1;s:2:"re";s:11:"Baiduspider";s:4:"name";s:5:"Baidu";s:4:"desc";s:47:"http://www.baidu.com/search/robots_english.html";}}';
     const OptionName = 'Niteoweb.SpiderBlocker.Bots';
     const nonce = 'Niteoweb.SpiderBlocker.Nonce';
     const CheckHook = 'Niteoweb.SpiderBlocker.CheckHook';
+    private $default_bots = array(
+        array(
+            'name' => 'Ahrefs Bot',
+            're' => 'AhrefsBot',
+            'desc' => 'https://ahrefs.com/robot/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'MJ12 bot',
+            're' => 'MJ12bot',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Roger Bot',
+            're' => 'Rogerbot',
+            'desc' => 'http://moz.com/help/pro/rogerbot-crawler',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Semrush Bot',
+            're' => 'SemrushBot',
+            'desc' => 'http://www.semrush.com/bot.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'ia_archiver',
+            're' => 'ia_archiver',
+            'desc' => 'http://archive.org/about/exclude.php',
+            'state' => true,
+        ),
+        array(
+            'name' => 'ScoutJet',
+            're' => 'ScoutJet',
+            'desc' => 'http://scoutjet.com',
+            'state' => true,
+        ),
+        array(
+            'name' => 'sistrix',
+            're' => 'sistrix',
+            'desc' => 'http://crawler.sistrix.net',
+            'state' => true,
+        ),
+        array(
+            'name' => 'SearchmetricsBot',
+            're' => 'SearchmetricsBot',
+            'desc' => 'http://www.searchmetrics.com/en/searchmetrics-bot/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'SEOkicks-Robot',
+            're' => 'SEOkicks-Robot',
+            'desc' => 'http://www.seokicks.de/robot.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Lipperhey Spider',
+            're' => 'Lipperhey Spider',
+            'desc' => 'http://www.lipperhey.com/en/website-spider/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Exabot',
+            're' => 'Exabot',
+            'desc' => 'http://www.exalead.com/search/webmasterguide',
+            'state' => true,
+        ),
+        array(
+            'name' => 'NC Bot',
+            're' => 'NCBot',
+            'desc' => 'https://twitter.com/NetComber/status/334476871691550721',
+            'state' => true,
+        ),
+        array(
+            'name' => 'BacklinkCrawler',
+            're' => 'BacklinkCrawler',
+            'desc' => 'http://www.backlinktest.com/crawler.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'archive.org Bot',
+            're' => 'archive.org_bot',
+            'desc' => 'http://archive.org/details/archive.org_bot',
+            'state' => true,
+        ),
+        array(
+            'name' => 'MeanPath Bot',
+            're' => 'meanpathbot',
+            'desc' => 'https://meanpath.com/meanpathbot.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'PagesInventory Bot',
+            're' => 'PagesInventory',
+            'desc' => 'http://www.botsvsbrowsers.com/details/1002332/index.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Aboundex Bot',
+            're' => 'Aboundexbot',
+            'desc' => 'http://www.aboundex.com/crawler/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'SeoProfiler Bot',
+            're' => 'spbot',
+            'desc' => 'http://www.seoprofiler.com/bot/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Linkdex Bot',
+            're' => 'linkdexbot',
+            'desc' => 'http://www.linkdex.com/about/bots/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Gigabot',
+            're' => 'Gigabot',
+            'desc' => 'http://www.useragentstring.com/pages/Gigabot/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'DotBot',
+            're' => 'dotbot',
+            'desc' => 'http://en.wikipedia.org/wiki/DotBot',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Nutch',
+            're' => 'Nutch',
+            'desc' => 'http://nutch.apache.org/bot.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'BLEX Bot',
+            're' => 'BLEXBot',
+            'desc' => 'http://webmeup-crawler.com/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Ezooms',
+            're' => 'Ezooms',
+            'desc' => 'http://graphicline.co.za/blogs/what-is-ezooms-bot',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Majestic 12',
+            're' => 'Majestic-12',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Majestic SEO',
+            're' => 'Majestic-SEO',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
+            'name' => 'DSearch',
+            're' => 'DSearch',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Blekko Bot',
+            're' => 'BlekkoBot',
+            'desc' => 'http://blekko.com/about/blekkobot',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Yandex',
+            're' => 'Yandex',
+            'desc' => 'http://help.yandex.com/search/?id=1112030',
+            'state' => false,
+        ),
+        array(
+            'name' => 'Google Bot',
+            're' => 'googlebot',
+            'desc' => 'https://support.google.com/webmasters/answer/182072?hl=en',
+            'state' => false,
+        ),
+        array(
+            'name' => 'Feedfetcher Google',
+            're' => 'Feedfetcher-Google',
+            'desc' => 'https://support.google.com/webmasters/answer/178852',
+            'state' => false,
+        ),
+        array(
+            'name' => 'Bing Bot',
+            're' => 'BingBot',
+            'desc' => 'http://en.wikipedia.org/wiki/Bingbot',
+            'state' => false,
+        ),
+        array(
+            'name' => 'Nerdy Bot',
+            're' => 'NerdyBot',
+            'desc' => 'http://nerdybot.com/',
+            'state' => true,
+        ),
+        array(
+            'name' => 'James BOT',
+            're' => 'JamesBOT',
+            'desc' => 'http://cognitiveseo.com/bot.html',
+            'state' => true,
+        ),
+        array(
+            'name' => 'Tin Eye',
+            're' => 'TinEye',
+            'desc' => 'http://www.tineye.com/crawler.html',
+            'state' => true,
+        ),
+        array(
+            'state' => true,
+            're' => 'Baiduspider',
+            'name' => 'Baidu',
+            'desc' => 'http://www.baidu.com/search/robots_english.html',
+        ),
+        array(
+            'state' => true,
+            're' => 'serpstat',
+            'name' => 'Serpstat',
+            'desc' => 'https://serpstat.com/',
+        ),
+        array(
+            'state' => true,
+            'desc' => 'https://www.spyfu.com/',
+            're' => 'spyfu',
+            'name' => 'SpyFu',
+        ),
+    );
 
     function __construct()
     {
@@ -51,10 +280,6 @@ class SpiderBlocker
             add_action('wp_ajax_NSB-reset_list', array(&$this, 'resetList'));
         }
         add_action('generate_rewrite_rules', array(&$this, "generateRewriteRules"));
-        add_action(self::CheckHook, array(&$this, "htaccessCheckHook"));
-        if (!wp_next_scheduled(self::CheckHook)) {
-            wp_schedule_event(time(), 'daily', self::CheckHook);
-        }
 
     }
 
@@ -98,7 +323,7 @@ class SpiderBlocker
             ?>
             <div class="notice notice-success">
                 <p>SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting <a
-                        href="<?php echo admin_url('tools.php?page=ni_spider_block'); ?>">Setting page</a>!</p>
+                            href="<?php echo admin_url('tools.php?page=ni_spider_block'); ?>">Setting page</a>!</p>
             </div>
             <?php
         }
@@ -137,15 +362,6 @@ class SpiderBlocker
         $this->generateBlockRules();
 
     }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public function htaccessCheckHook()
-    {
-
-    }
-
 
     /**
      * @codeCoverageIgnore
@@ -230,6 +446,7 @@ class SpiderBlocker
     {
         return maybe_unserialize(get_option(self::OptionName, $this->default_bots));
     }
+
 
     function loadList()
     {
@@ -481,7 +698,7 @@ class SpiderBlocker
                         <th scope="col" class="manage-column column-state">
                             <a href=""
                                ng-click="predicate = 'state'; reverse=false">State <span
-                                    class="dashicons dashicons-sort"></span></a>
+                                        class="dashicons dashicons-sort"></span></a>
                         </th>
                         <th scope="col" id="action" class="manage-column column-action">Action</th>
                     </tr>
@@ -526,8 +743,8 @@ class SpiderBlocker
                 </table>
                 <div id="rules-export-import" style="display:none;">
         <textarea
-            style="-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;width: 100%;height: 99%;"
-            json-text ng-model="bots"></textarea>
+                style="-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;width: 100%;height: 99%;"
+                json-text ng-model="bots"></textarea>
                 </div>
                 <p class="submit">
                     <input type="button" class="button button-primary" ng-click="save()" value="Save">
