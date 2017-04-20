@@ -3,7 +3,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.14
+ * Version:     1.0.15
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Author URI:  www.easyblognetworks.com
@@ -332,6 +332,14 @@ class SpiderBlocker
     /**
      * @codeCoverageIgnore
      */
+    function onPluginUpgrade()
+    {
+        $this->generateBlockRules();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
     function activatePlugin()
     {
         if (!apache_get_version()) {
@@ -428,6 +436,9 @@ class SpiderBlocker
     {
         $list = array();
         foreach ($this->getBots() as $bot) {
+            if(is_array($bot)){
+                $bot = (object) $bot;
+            }
             if ($bot->state) {
                 $list[] = 'SetEnvIfNoCase User-Agent "' . $bot->re . '" block_bot';
             }
@@ -444,7 +455,11 @@ class SpiderBlocker
 
     private function getBots()
     {
-        return maybe_unserialize(get_option(self::OptionName, $this->default_bots));
+        $data = get_option(self::OptionName);
+        if($data && is_array($data) && count($data) > 0){
+            return maybe_unserialize($data);
+        }
+        return $this->default_bots;
     }
 
 
@@ -764,6 +779,7 @@ class SpiderBlocker
 // Inside WordPress
 if (defined('ABSPATH')) {
     $NiteowebSpiderBlocker_ins = new SpiderBlocker;
+    add_action( "upgrader_process_complete", array(&$NiteowebSpiderBlocker_ins, 'onPluginUpgrade'), 10, 2);
     register_activation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'activatePlugin'));
     register_deactivation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'removeBlockRules'));
 }

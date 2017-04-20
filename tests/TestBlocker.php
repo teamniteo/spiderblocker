@@ -170,6 +170,7 @@ class TestBlocker extends PHPUnit_Framework_TestCase
 
         \WP_Mock::wpFunction('get_option', array(
                 'called' => 1,
+                'return' => array("a", "b", "c")
             )
         );
 
@@ -279,11 +280,6 @@ class TestBlocker extends PHPUnit_Framework_TestCase
             )
         );
 
-        \WP_Mock::wpFunction('get_option', array(
-                'called' => 1,
-                'args' => array('Niteoweb.SpiderBlocker.Bots', '*'),
-            )
-        );
 
         \WP_Mock::wpFunction('delete_option', array(
                 'called' => 1,
