@@ -3,7 +3,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.15
+ * Version:     1.0.16
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Author URI:  www.easyblognetworks.com
@@ -456,7 +456,7 @@ class SpiderBlocker
     private function getBots()
     {
         $data = get_option(self::OptionName);
-        if($data && is_array($data) && count($data) > 0){
+        if($data && count($data) > 0){
             return maybe_unserialize($data);
         }
         return $this->default_bots;

@@ -2,7 +2,7 @@
 
 use Niteoweb\SpiderBlocker\SpiderBlocker;
 
-class TestBlocker extends PHPUnit_Framework_TestCase
+class TestBlocker extends \PHPUnit\Framework\TestCase
 {
 
     function setUp()
@@ -13,6 +13,9 @@ class TestBlocker extends PHPUnit_Framework_TestCase
 
     function tearDown()
     {
+        $this->addToAssertionCount(
+            \Mockery::getContainer()->mockery_getExpectationCount()
+        );
         \WP_Mock::tearDown();
     }
 
