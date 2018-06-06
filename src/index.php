@@ -456,7 +456,7 @@ class SpiderBlocker
     private function getBots()
     {
         $data = get_option(self::OptionName);
-        if($data && count($data) > 0){
+        if($data){
             return maybe_unserialize($data);
         }
         return $this->default_bots;
