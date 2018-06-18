@@ -27,4 +27,4 @@ More info on <a href="http://blog.easyblognetworks.com/2015/free-spider-blocker-
 
 ## We're hiring!
 
-At Niteo we regularly give back to the Open Source community. If you do too, we'd like to invite you to [join our team](https://niteo.co/careers)!
+At Niteo we regularly contribute back to the Open Source community. If you do too, we'd like to invite you to [join our team](https://niteo.co/careers)!
