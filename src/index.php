@@ -203,6 +203,12 @@ class SpiderBlocker
             'state' => true,
         ),
         array(
+            'name' => 'MJ12',
+            're' => 'MJ12',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
             'name' => 'Blekko Bot',
             're' => 'BlekkoBot',
             'desc' => 'http://blekko.com/about/blekkobot',
