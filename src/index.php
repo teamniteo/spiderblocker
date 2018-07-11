@@ -285,6 +285,9 @@ class SpiderBlocker
             add_action('wp_ajax_NSB-set_list', array(&$this, 'saveList'));
             add_action('wp_ajax_NSB-reset_list', array(&$this, 'resetList'));
         }
+
+        // Filter (for robots.txt)
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
         add_action('generate_rewrite_rules', array(&$this, "generateRewriteRules"));
 
     }
@@ -325,7 +328,7 @@ class SpiderBlocker
     function activatePluginNotice()
     {
         if (get_option(self::OptionName) === false) {
-            update_option(self::OptionName, $this->default_bots);
+            update_option(self::OptionName, maybe_serialize($this->default_bots));
             ?>
             <div class="notice notice-success">
                 <p>SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting <a
@@ -480,6 +483,8 @@ class SpiderBlocker
         check_ajax_referer(self::nonce, 'nonce');
         delete_option(self::OptionName);
         $this->generateBlockRules();
+        add_option(self::OptionName, maybe_serialize($this->getBots()), null, 'no');
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
         wp_send_json_success($this->getBots());
     }
 
@@ -501,7 +506,7 @@ class SpiderBlocker
     {
 
         check_ajax_referer(self::nonce, 'nonce');
-        $data = json_decode(stripcslashes($_POST['data']));
+        $data = json_decode(stripcslashes($_POST['data']), true);
 
         if (json_last_error()) {
             if (function_exists('json_last_error_msg')) {
@@ -518,7 +523,33 @@ class SpiderBlocker
         }
 
         $this->generateBlockRules();
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
         wp_send_json_success($this->getBots());
+
+    }
+
+    function robotsFile( $output, $public ) {
+
+        // Get bots list
+        $data = get_option(self::OptionName);
+
+        if ( $data ) {
+            $serialize_data = maybe_unserialize( $data );
+
+            foreach ( $serialize_data as $entry ) {
+              if ( empty( $entry['state'] ) ) {
+                $output .= "User-agent: " . ucfirst( $entry['re'] ) . "\n";
+                $output .= "Disallow: \n";
+                $output .= "\n";
+              }
+            }
+
+            $output .= 'User-agent: *' . "\n";
+            $output .= "Disallow: /\n";
+            $output .= "\n";
+        }
+
+        return $output;
 
     }
 
@@ -779,12 +810,12 @@ class SpiderBlocker
         <?php
     }
 
-
 }
 
 // Inside WordPress
 if (defined('ABSPATH')) {
     $NiteowebSpiderBlocker_ins = new SpiderBlocker;
+
     add_action( "upgrader_process_complete", array(&$NiteowebSpiderBlocker_ins, 'onPluginUpgrade'), 10, 2);
     register_activation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'activatePlugin'));
     register_deactivation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'removeBlockRules'));
