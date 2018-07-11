@@ -483,7 +483,6 @@ class SpiderBlocker
         check_ajax_referer(self::nonce, 'nonce');
         delete_option(self::OptionName);
         $this->generateBlockRules();
-        add_option(self::OptionName, maybe_serialize($this->getBots()), null, 'no');
         add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
         wp_send_json_success($this->getBots());
     }
@@ -531,22 +530,16 @@ class SpiderBlocker
     function robotsFile( $output, $public ) {
 
         // Get bots list
-        $data = get_option(self::OptionName);
+        $data = $this->getBots();
 
         if ( $data ) {
-            $serialize_data = maybe_unserialize( $data );
-
-            foreach ( $serialize_data as $entry ) {
-              if ( empty( $entry['state'] ) ) {
+            foreach ( $data as $entry ) {
+              if ( ! empty( $entry['state'] ) ) {
                 $output .= "User-agent: " . ucfirst( $entry['re'] ) . "\n";
-                $output .= "Disallow: \n";
+                $output .= "Disallow: /\n";
                 $output .= "\n";
               }
             }
-
-            $output .= 'User-agent: *' . "\n";
-            $output .= "Disallow: /\n";
-            $output .= "\n";
         }
 
         return $output;
