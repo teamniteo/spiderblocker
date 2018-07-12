@@ -287,7 +287,7 @@ class SpiderBlocker
         }
 
         // Filter (for robots.txt)
-        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         add_action('generate_rewrite_rules', array(&$this, "generateRewriteRules"));
 
     }
@@ -328,7 +328,7 @@ class SpiderBlocker
     function activatePluginNotice()
     {
         if (get_option(self::OptionName) === false) {
-            update_option(self::OptionName, maybe_serialize($this->default_bots));
+            update_option(self::OptionName, $this->default_bots);
             ?>
             <div class="notice notice-success">
                 <p>SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting <a
@@ -535,7 +535,7 @@ class SpiderBlocker
         if ( $data ) {
             foreach ( $data as $entry ) {
               if ( ! empty( $entry['state'] ) ) {
-                $output .= "User-agent: " . ucfirst( $entry['re'] ) . "\n";
+                $output .= sprintf( "User-agent: %s\n", $entry['re'] );
                 $output .= "Disallow: /\n";
                 $output .= "\n";
               }
