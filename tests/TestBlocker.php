@@ -37,6 +37,7 @@ class TestBlocker extends \PHPUnit\Framework\TestCase
         \WP_Mock::expectActionAdded('wp_ajax_NSB-get_list', array($plugin, 'loadList'));
         \WP_Mock::expectActionAdded('wp_ajax_NSB-set_list', array($plugin, 'saveList'));
         \WP_Mock::expectActionAdded('wp_ajax_NSB-reset_list', array($plugin, 'resetList'));
+        \WP_Mock::expectFilterAdded('robots_txt', array($plugin, 'robotsFile'), ~PHP_INT_MAX, 2);
         \WP_Mock::expectActionAdded('generate_rewrite_rules', array($plugin, 'generateRewriteRules'));
 
         $plugin->__construct();
@@ -290,6 +291,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase
             )
         );
 
+        \WP_Mock::expectFilterAdded('robots_txt', array($plugin, 'robotsFile'), ~PHP_INT_MAX, 2);
+
         $plugin->resetList();
 
     }
@@ -363,6 +366,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase
                 'args' => array("Niteoweb.SpiderBlocker.Bots", "", "", "no"),
             )
         );
+
+        \WP_Mock::expectFilterAdded('robots_txt', array($plugin, 'robotsFile'), ~PHP_INT_MAX, 2);
 
         $_POST['data'] = '[{"name":"True Bot","re":"TrueBot","desc":"True","state":true}]';
 
@@ -553,6 +558,45 @@ class TestBlocker extends \PHPUnit\Framework\TestCase
         );
 
         $plugin->removeBlockRules();
+
+    }
+
+    public function test_robots_filter() {
+
+        \WP_Mock::wpFunction('wp_next_scheduled', array(
+                'return' => true,
+            )
+        );
+
+        $plugin = new SpiderBlocker;
+
+        \WP_Mock::wpFunction('maybe_unserialize', array(
+                'called' => 1,
+                'return' => json_decode(json_encode(array(
+                    array(
+                        'name' => 'True Bot',
+                        're' => 'TrueBot',
+                        'desc' => 'True',
+                        'state' => true,
+                    ),
+                    array(
+                        'name' => 'False Bot',
+                        're' => 'FalseBot',
+                        'desc' => 'False',
+                        'state' => false,
+                    )
+                ), false), true),
+            )
+        );
+
+        \WP_Mock::wpFunction('get_option', array(
+                'called' => 1,
+                'return' => array("one", "two", "three")
+            )
+        );
+
+        $this->assertEquals($plugin->robotsFile( '', true ), "User-agent: TrueBot\nDisallow: /\n\n"
+        );
 
     }
 

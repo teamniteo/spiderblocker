@@ -483,7 +483,7 @@ class SpiderBlocker
         check_ajax_referer(self::nonce, 'nonce');
         delete_option(self::OptionName);
         $this->generateBlockRules();
-        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         wp_send_json_success($this->getBots());
     }
 
@@ -522,7 +522,7 @@ class SpiderBlocker
         }
 
         $this->generateBlockRules();
-        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), 10, 2 );
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         wp_send_json_success($this->getBots());
 
     }
