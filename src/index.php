@@ -3,7 +3,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.16
+ * Version:     1.0.17
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Author URI:  www.easyblognetworks.com
@@ -203,6 +203,12 @@ class SpiderBlocker
             'state' => true,
         ),
         array(
+            'name' => 'MJ12',
+            're' => 'MJ12',
+            'desc' => 'http://www.majestic12.co.uk/projects/dsearch/mj12bot.php',
+            'state' => true,
+        ),
+        array(
             'name' => 'Blekko Bot',
             're' => 'BlekkoBot',
             'desc' => 'http://blekko.com/about/blekkobot',
@@ -279,6 +285,9 @@ class SpiderBlocker
             add_action('wp_ajax_NSB-set_list', array(&$this, 'saveList'));
             add_action('wp_ajax_NSB-reset_list', array(&$this, 'resetList'));
         }
+
+        // Filter (for robots.txt)
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         add_action('generate_rewrite_rules', array(&$this, "generateRewriteRules"));
 
     }
@@ -474,6 +483,7 @@ class SpiderBlocker
         check_ajax_referer(self::nonce, 'nonce');
         delete_option(self::OptionName);
         $this->generateBlockRules();
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         wp_send_json_success($this->getBots());
     }
 
@@ -495,7 +505,7 @@ class SpiderBlocker
     {
 
         check_ajax_referer(self::nonce, 'nonce');
-        $data = json_decode(stripcslashes($_POST['data']));
+        $data = json_decode(stripcslashes($_POST['data']), true);
 
         if (json_last_error()) {
             if (function_exists('json_last_error_msg')) {
@@ -512,7 +522,27 @@ class SpiderBlocker
         }
 
         $this->generateBlockRules();
+        add_filter( 'robots_txt', array (&$this, 'robotsFile' ), ~PHP_INT_MAX, 2 );
         wp_send_json_success($this->getBots());
+
+    }
+
+    function robotsFile( $output, $public ) {
+
+        // Get bots list
+        $data = $this->getBots();
+
+        if ( $data ) {
+            foreach ( $data as $entry ) {
+              if ( ! empty( $entry['state'] ) ) {
+                $output .= sprintf( "User-agent: %s\n", $entry['re'] );
+                $output .= "Disallow: /\n";
+                $output .= "\n";
+              }
+            }
+        }
+
+        return $output;
 
     }
 
@@ -773,12 +803,12 @@ class SpiderBlocker
         <?php
     }
 
-
 }
 
 // Inside WordPress
 if (defined('ABSPATH')) {
     $NiteowebSpiderBlocker_ins = new SpiderBlocker;
+
     add_action( "upgrader_process_complete", array(&$NiteowebSpiderBlocker_ins, 'onPluginUpgrade'), 10, 2);
     register_activation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'activatePlugin'));
     register_deactivation_hook(__FILE__, array(&$NiteowebSpiderBlocker_ins, 'removeBlockRules'));
