@@ -9,6 +9,7 @@ namespace Niteoweb\SpiderBlocker;
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Text Domain: spiderblocker
+ * Domain Path: /langs/
  * Author URI:  www.easyblognetworks.com
  */
 
