@@ -3,9 +3,11 @@
 namespace Niteoweb\SpiderBlocker;
 
 /**
- * Main class.
+ * Spiderblocker class where all the action happens.
  *
- * @package spiderblocker
+ * @package WordPress
+ * @subpackage spiderblocker
+ * @since 1.0.18
  */
 class SpiderBlocker {
 
@@ -13,7 +15,11 @@ class SpiderBlocker {
 	const NONCE      = 'Niteoweb.SpiderBlocker.Nonce';
 	const CHECKHOOK  = 'Niteoweb.SpiderBlocker.CheckHook';
 
-	// Ever increasing bot list.
+	/**
+	 * Bots which can be blocked by the spiderblocker plugin
+	 *
+	 * @var array $default_bots Array of bots
+	 */
 	private $default_bots = array(
 		array(
 			'name'  => 'Ahrefs Bot',
@@ -270,11 +276,11 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * Protect plugin from direct access.
 	 *
-	 *
+	 * @param type $wp_rewrite Class for managing the rewrite rules.
 	 */
-	private function generate_rewrite_rules( $wp_rewrite ) {
-		// Protect plugin from direct access.
+	public function generate_rewrite_rules( $wp_rewrite ) {
 		$wp_rewrite->add_external_rule( $this->plugin_url() . 'spiderblocker.php', 'spiderblocker.php%{REQUEST_URI}' );
 		$wp_rewrite->add_external_rule( $this->plugin_url() . 'readme.txt', 'spiderblocker.php%{REQUEST_URI}' );
 		$wp_rewrite->add_external_rule( $this->plugin_url(), 'spiderblocker.php%{REQUEST_URI}' );
@@ -294,20 +300,22 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
-	 *
+	 * Add submenu page to the Tools main menu.
 	 */
-	private function admin_menu() {
-		add_management_page(
+	public function admin_menu() {
+		$menu = add_management_page(
 			'SpiderBlocker', 'SpiderBlocker', 'manage_options', 'ni_spider_block', array( &$this, 'view_handler' )
 		);
+
+		add_action( 'load-' . $menu, array( &$this, 'view_handler_load' ) );
 	}
 
 	/**
+	 * Admin notice which gets fired on plugin activation.
 	 *
 	 * @codeCoverageIgnore
 	 */
-	private function activate_plugin_notice() {
+	public function activate_plugin_notice() {
 		if ( get_option( self::OPTIONNAME ) === false ) {
 			update_option( self::OPTIONNAME, $this->default_bots );
 			?>
@@ -319,6 +327,8 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * Generate block rules when the download process for a plugin
+	 * install or update finishes.
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -327,6 +337,7 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * This gets fired on plugin activation.
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -365,6 +376,7 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * Check if the .htaccess file is writable.
 	 *
 	 * @return bool
 	 * @codeCoverageIgnore
@@ -375,6 +387,7 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * Function to join the supplied arguments together.
 	 *
 	 * @return string
 	 * @codeCoverageIgnore
@@ -406,10 +419,9 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
-	 *
+	 * Add our rules for bots in the .htaccess file.
 	 */
-	private function generate_block_rules() {
+	public function generate_block_rules() {
 		global $wp_rewrite;
 
 		$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
@@ -427,7 +439,7 @@ class SpiderBlocker {
 	 *
 	 * @return array
 	 */
-	private function get_rules() {
+	public function get_rules() {
 		$list = array();
 		foreach ( $this->get_bots() as $bot ) {
 			if ( is_array( $bot ) ) {
@@ -447,10 +459,12 @@ class SpiderBlocker {
 	}
 
 	/**
+	 * Get the list of bots from the database or return default
+	 * list if nothing found in the database.
 	 *
 	 * @return array
 	 */
-	private function get_bots() {
+	public function get_bots() {
 		$data = get_option( self::OPTIONNAME );
 		if ( $data ) {
 			return maybe_unserialize( $data );
@@ -459,19 +473,17 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
-	 *
+	 * Gets called via AJAX to return the the list of bots.
 	 */
-	private function load_list() {
+	public function load_list() {
 		check_ajax_referer( self::NONCE, 'nonce' );
 		wp_send_json_success( $this->get_bots() );
 	}
 
 	/**
-	 *
-	 *
+	 * Gets called via AJAX to return the the list of default bots.
 	 */
-	private function reset_list() {
+	public function reset_list() {
 		check_ajax_referer( self::NONCE, 'nonce' );
 		delete_option( self::OPTIONNAME );
 		$this->generate_block_rules();
@@ -480,11 +492,11 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
-	 *
+	 * Remove our bot rules from the .htaccess file.
 	 */
 	public function remove_block_rules() {
 		global $wp_rewrite;
+
 		delete_option( self::OPTIONNAME );
 		$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
 		$htaccess_file = $home_path . '.htaccess';
@@ -497,37 +509,43 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
-	 *
+	 * Gets called via AJAX to update the bots list in the database.
 	 */
-	private function save_list() {
+	public function save_list() {
 		check_ajax_referer( self::NONCE, 'nonce' );
-		$data = json_decode( stripcslashes( $_POST['data'] ), true );
+		if ( isset( $_POST['data'] ) && '' !== $_POST['data'] ) {
+			$data = json_decode( stripcslashes( $_POST['data'] ), true );
 
-		if ( json_last_error() ) {
-			if ( function_exists( 'json_last_error_msg' ) ) {
-				wp_send_json_error( json_last_error_msg() );
-			} else {
-				wp_send_json_error( 'Failed parsing JSON' );
+			if ( json_last_error() ) {
+				if ( function_exists( 'json_last_error_msg' ) ) {
+					wp_send_json_error( json_last_error_msg() );
+				} else {
+					wp_send_json_error( esc_html__( 'Failed parsing JSON', 'spiderblocker' ) );
+				}
 			}
-		}
-		if ( get_option( self::OPTIONNAME ) !== false ) {
-			update_option( self::OPTIONNAME, maybe_serialize( $data ) );
+
+			if ( get_option( self::OPTIONNAME ) !== false ) {
+				update_option( self::OPTIONNAME, maybe_serialize( $data ) );
+			} else {
+				add_option( self::OPTIONNAME, maybe_serialize( $data ), '', 'no' );
+			}
+
+			$this->generate_block_rules();
+			add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
+			wp_send_json_success( $this->get_bots() );
 		} else {
-			add_option( self::OPTIONNAME, maybe_serialize( $data ), '', 'no' );
+			wp_send_json_error( esc_html__( 'Unable to process the request as no data has been received.', 'spiderblocker' ) );
 		}
-
-		$this->generate_block_rules();
-		add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
-		wp_send_json_success( $this->get_bots() );
-
 	}
 
 	/**
+	 * This function is supplied to robots_txt filter to add bots block
+	 * rules to the robots.txt file.
 	 *
-	 *
+	 * @param string $output Output of the robots.txt file before our additions.
+	 * @param bool   $public Blog's public status fetched from the database.
 	 */
-	private function robots_file( $output, $public ) {
+	public function robots_file( $output, $public ) {
 		// Get bots list.
 		$data = $this->get_bots();
 
@@ -545,12 +563,11 @@ class SpiderBlocker {
 	}
 
 	/**
-	 *
+	 * Plugin HTML is rendered via this function.
 	 *
 	 * @codeCoverageIgnore
 	 */
-	private function view_handler() {
-		add_thickbox();
+	public function view_handler() {
 		?>
 		<style>
 			.notice.fixed {
@@ -568,7 +585,6 @@ class SpiderBlocker {
 			}
 		</style>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js" type="text/javascript"></script>
 		<script>
 			window.sb_nonce = "<?php echo esc_html( wp_create_nonce( self::NONCE ) ); ?>";
 			-(function () {
@@ -779,6 +795,22 @@ class SpiderBlocker {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Adds action for admin scripts.
+	 */
+	public function view_handler_load() {
+		add_action( 'admin_enqueue_scripts', array( &$this, 'view_handler_scripts' ) );
+	}
+
+	/**
+	 * Registers & Enqueues the admin scripts for the view_handler() function.
+	 */
+	public function view_handler_scripts() {
+		wp_register_script( 'spiderblocker-angular', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), '1.0.18', false );
+		wp_enqueue_script( 'spiderblocker-angular' );
+		wp_enqueue_media( 'thickbox' );
 	}
 
 }
