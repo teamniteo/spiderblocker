@@ -54,7 +54,6 @@ if ( version_compare( PHP_VERSION, '5.3.0', '<' ) ) {
  *
  * @package WordPress
  * @subpackage spiderblocker
- * @since 1.0.18
  */
 class SpiderBlocker {
 
