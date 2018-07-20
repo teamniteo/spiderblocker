@@ -103,19 +103,19 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$wp_rewrite->shouldReceive( 'add_external_rule' )->withArgs(
 			array(
 				'wp-content/plugins/spider_blocker/',
-				'spiderblocker.php%{REQUEST_URI}',
+				'index.php%{REQUEST_URI}',
 			)
 		);
 		$wp_rewrite->shouldReceive( 'add_external_rule' )->withArgs(
 			array(
-				'wp-content/plugins/spider_blocker/spiderblocker.php',
-				'spiderblocker.php%{REQUEST_URI}',
+				'wp-content/plugins/spider_blocker/index.php',
+				'index.php%{REQUEST_URI}',
 			)
 		);
 		$wp_rewrite->shouldReceive( 'add_external_rule' )->withArgs(
 			array(
 				'wp-content/plugins/spider_blocker/readme.txt',
-				'spiderblocker.php%{REQUEST_URI}',
+				'index.php%{REQUEST_URI}',
 			)
 		);
 
