@@ -5,7 +5,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.18
+ * Version:     1.0.19
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Text Domain: spiderblocker
@@ -592,16 +592,15 @@ class SpiderBlocker {
 	 * @param bool   $public Blog's public status fetched from the database.
 	 */
 	public function robots_file( $output, $public ) {
-		// Get bots list.
-		$data = $this->get_bots();
+		foreach ( $this->get_bots() as $bot ) {
+			if ( is_array( $bot ) ) {
+				$bot = (object) $bot;
+			}
 
-		if ( $data ) {
-			foreach ( $data as $entry ) {
-				if ( ! empty( $entry['state'] ) ) {
-					$output .= sprintf( "User-agent: %s\n", $entry['re'] );
-					$output .= "Disallow: /\n";
-					$output .= "\n";
-				}
+			if ( ! empty( $bot->state ) ) {
+				$output .= sprintf( "User-agent: %s\n", $bot->re );
+				$output .= "Disallow: /\n";
+				$output .= "\n";
 			}
 		}
 
