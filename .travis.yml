@@ -16,3 +16,11 @@ before_script:
 script: bin/phpunit
 after_script:
 - bin/coveralls -v
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script:
+    - "yes yes | svn --username=$SVN_USER --password=$SVN_PASSWORD ls http://plugins.svn.wordpress.org/spiderblocker &>/dev/null"   
+    - "make publish"
+    on:
+      tags: true

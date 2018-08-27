@@ -7,14 +7,14 @@ SVNUSER := niteoweb
 test:
 	bin/phpunit
 
-release:
+zip:
 	mkdir -p build
 	cp -ar src $(PLUGINSLUG)
 	zip -r $(PLUGINSLUG).zip $(PLUGINSLUG)
 	rm -rf $(PLUGINSLUG)
 	mv $(PLUGINSLUG).zip build/
 
-deploy:
+publish:
 	@rm -fr /tmp/$(PLUGINSLUG)/
 	svn co http://plugins.svn.wordpress.org/$(PLUGINSLUG)/ /tmp/$(PLUGINSLUG)
 	cp -ar $(SRCPATH)/* /tmp/$(PLUGINSLUG)/trunk/
@@ -23,3 +23,12 @@ deploy:
 	cd /tmp/$(PLUGINSLUG)/; svn copy trunk/ tags/$(VERSION)/
 	cd /tmp/$(PLUGINSLUG)/tags/$(VERSION)/; svn commit --username=$(SVNUSER) -m "Tagging version $(VERSION)"
 	# rm -fr /tmp/$(PLUGINSLUG)/
+
+release:
+	git stash
+	git fetch -p
+	git checkout master
+	git pull -r
+	git tag $(VERSION)
+	git push origin $(VERSION)
+	git pull -r
