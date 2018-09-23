@@ -5,7 +5,7 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.19
+ * Version:     1.0.20
  * Runtime:     5.3+
  * Author:      Easy Blog Networks
  * Text Domain: spiderblocker
@@ -855,7 +855,9 @@ class SpiderBlocker {
 	public function view_handler_scripts() {
 		wp_register_script( 'spiderblocker-angular', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), '1.0.18', false );
 		wp_enqueue_script( 'spiderblocker-angular' );
-		wp_enqueue_media( 'thickbox' );
+
+		wp_enqueue_script( 'thickbox' );
+		wp_enqueue_style( 'thickbox' );
 	}
 
 }
