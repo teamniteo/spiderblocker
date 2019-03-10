@@ -23,4 +23,4 @@ with Apache server and mod_rewrite enabled.
 1. Upload 'spider-blocker' directory to the '/wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to **Tools** menu and then **SpiderBlocker* to configure
-4. If you use any other plugin to edit .htaacess file, make sure that content of file is valid
+4. If you use any other plugin to edit .htaccess file, make sure that content of file is valid
