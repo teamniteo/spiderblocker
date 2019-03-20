@@ -1,5 +1,5 @@
 workflow "Deploy" {
-  resolves = ["WordPress Plugin Deploy"]
+  resolves = ["Deploy Plugin"]
   on = "push"
 }
 
