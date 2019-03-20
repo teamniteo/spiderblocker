@@ -9,9 +9,9 @@ action "tag" {
     args = "tag"
 }
 
-action "WordPress Plugin Deploy" {
+action "Deploy Plugin" {
   needs = ["tag"]
-  uses = "10up/actions-wordpress/dotorg-plugin-deploy@master"
+  uses = "./.github/deploy-plugin"
   secrets = ["SVN_PASSWORD", "SVN_USERNAME"]
   env = {
     SLUG = "spiderblocker"
