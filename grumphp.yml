@@ -1,0 +1,12 @@
+parameters:
+    git_dir: .
+    bin_dir: vendor/bin
+    tasks:
+      file_size: ~
+      git_blacklist: ~
+      git_branch_name: ~
+      git_commit_message: ~
+      make:
+          make_file: ~
+          task: fmt
+          triggered_by: [php]
