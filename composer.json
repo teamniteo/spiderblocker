@@ -1,6 +1,6 @@
 {
     "require": {
-      "php": ">=7.2.0",
+      "php": ">=7.2.0"
     },
     "require-dev": {
       "dealerdirect/phpcodesniffer-composer-installer": "*",
@@ -20,5 +20,4 @@
     "config": {
       "bin-dir": "bin/"
     }
-  }
-  
+}
