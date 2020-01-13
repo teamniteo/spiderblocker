@@ -20,6 +20,14 @@ unit: test
 test: vendor
 	bin/phpunit --coverage-html=./reports
 
+dist: ensure
+	sed -i "s/@##VERSION##@/${VERSION}/" src/index.php
+	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/spiderblocker.pot
+	mkdir -p dist
+	cp -r $(SRCPATH)/. dist/
+	sed -i "s/${VERSION}/@##VERSION##@/" src/index.php
+	sed -i "s/${VERSION}/@##VERSION##@/" src/i18n/spiderblocker.pot
+
 build: ensure
 	sed -i "s/@##VERSION##@/${VERSION}/" src/index.php
 	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/spiderblocker.pot
