@@ -1,10 +1,14 @@
 vendor
 bin
 cover
-composer.lock
 tmp
 build
 .idea
 *~
 *.zip
 .DS_Store
+*.phar
+reports
+clover.xml
+src/vendor
+dist

@@ -5,11 +5,11 @@ namespace Niteoweb\SpiderBlocker;
 /**
  * Plugin Name: Spider Blocker
  * Description: Spider Blocker will block most common bots that consume bandwidth and slow down your server.
- * Version:     1.0.22
- * Runtime:     5.3+
+ * Version:     @##VERSION##@
+ * Runtime:     5.6+
  * Author:      Easy Blog Networks
  * Text Domain: spiderblocker
- * Domain Path: /langs/
+ * Domain Path: i18n
  * Author URI:  www.easyblognetworks.com
  */
 
@@ -31,16 +31,17 @@ if ( ! function_exists( 'apache_get_version' ) ) {
 }
 
 /**
- * Checks for PHP version and stop the plugin if the version is < 5.3.0.
+ * Checks for PHP version and stop the plugin if the version is < 5.6.0.
  */
-if ( version_compare( PHP_VERSION, '5.3.0', '<' ) ) {
+if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
 	?>
 	<div id="error-page">
 		<p>
 		<?php
 		esc_html_e(
-			'This plugin requires PHP 5.3.0 or higher. Please contact your hosting provider about upgrading your
-			server software. Your PHP version is', 'spiderblocker'
+			'This plugin requires PHP 5.6.0 or higher. Please contact your hosting provider about upgrading your
+			server software. Your PHP version is',
+			'spiderblocker'
 		);
 		?>
 		<b><?php echo sanitize_text_field( PHP_VERSION ); ?></b></p>
@@ -350,7 +351,11 @@ class SpiderBlocker {
 	 */
 	public function admin_menu() {
 		$menu = add_management_page(
-			'SpiderBlocker', 'SpiderBlocker', 'manage_options', 'ni_spider_block', array( &$this, 'view_handler' )
+			'SpiderBlocker',
+			'SpiderBlocker',
+			'manage_options',
+			'ni_spider_block',
+			array( &$this, 'view_handler' )
 		);
 
 		add_action( 'load-' . $menu, array( &$this, 'view_handler_load' ) );
@@ -397,9 +402,9 @@ class SpiderBlocker {
 			die();
 		}
 
-		if ( ! SpiderBlocker::is_htaccess_writable() ) {
-			$state = SpiderBlocker::chmod_htaccess();
-			if ( ! SpiderBlocker::is_htaccess_writable() || ! $state ) {
+		if ( ! self::is_htaccess_writable() ) {
+			$state = self::chmod_htaccess();
+			if ( ! self::is_htaccess_writable() || ! $state ) {
 				?>
 				<div id="error-page">
 					<p>
@@ -428,7 +433,7 @@ class SpiderBlocker {
 	 * @codeCoverageIgnore
 	 */
 	private static function is_htaccess_writable() {
-		$htaccess_file = SpiderBlocker::join_paths( ABSPATH, '.htaccess' );
+		$htaccess_file = self::join_paths( ABSPATH, '.htaccess' );
 		return is_writable( $htaccess_file );
 	}
 

@@ -1,11 +1,11 @@
 <?php
 
 use Niteoweb\SpiderBlocker\SpiderBlocker;
+use PHPUnit\Framework\TestCase;
 
-class TestBlocker extends \PHPUnit\Framework\TestCase {
+class BlockerTest extends TestCase {
 
 	function setUp() {
-		\WP_Mock::setUsePatchwork( true );
 		\WP_Mock::setUp();
 	}
 
@@ -14,17 +14,23 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 			\Mockery::getContainer()->mockery_getExpectationCount()
 		);
 		\WP_Mock::tearDown();
+		\Mockery::close();
 	}
 
-	public function test_init_admin() {
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 */
+	public function testInitAdmin() {
 		\WP_Mock::wpFunction(
-			'is_admin', array(
+			'is_admin',
+			array(
 				'return' => true,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
@@ -42,14 +48,20 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		\WP_Mock::assertHooksAdded();
 	}
 
-	public function test_init_non_admin() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 */
+	public function testInitNonAdmin() {
 		\WP_Mock::wpFunction(
-			'is_admin', array(
+			'is_admin',
+			array(
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
@@ -62,39 +74,54 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		\WP_Mock::assertHooksAdded();
 	}
 
-	public function test_admin_menu() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::admin_menu
+	 */
+	public function testAdminMenu() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'add_management_page', array(
+			'add_management_page',
+			array(
 				'return' => true,
 				'args'   => array( 'SpiderBlocker', 'SpiderBlocker', 'manage_options', 'ni_spider_block', '*' ),
 			)
 		);
 
-        $plugin = new SpiderBlocker();
-        $plugin->admin_menu();
+		$plugin = new SpiderBlocker();
+		$plugin->admin_menu();
 	}
 
-	public function test_generate_rewrite_rules() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_rewrite_rules
+	 */
+	public function testGenerateRewriteRules() {
 		global $wp_rewrite;
 
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'wp_make_link_relative', array(
+			'wp_make_link_relative',
+			array(
 				'return' => '/wp-content/plugins/spider_blocker/',
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'plugin_dir_url', array(
+			'plugin_dir_url',
+			array(
 				'return' => 'http://localhost/wp-content/plugins/spider_blocker/',
 			)
 		);
@@ -123,11 +150,19 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->generate_rewrite_rules( $wp_rewrite );
 	}
 
-	public function test_rules_generation() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_rules
+	 */
+	public function testRulesGeneration() {
 		global $wp_rewrite;
 
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
@@ -137,18 +172,21 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'is_admin', array(
+			'is_admin',
+			array(
 				'return' => true,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'get_home_path', array(
+			'get_home_path',
+			array(
 				'return' => '/tmp/',
 			)
 		);
 		\WP_Mock::wpFunction(
-			'insert_with_markers', array(
+			'insert_with_markers',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'/tmp/.htaccess',
@@ -159,7 +197,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => json_decode(
 					json_encode(
@@ -176,14 +215,16 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 								'desc'  => 'False',
 								'state' => false,
 							),
-						), false
+						),
+						false
 					)
 				),
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'return' => array( 'a', 'b', 'c' ),
 			)
@@ -191,7 +232,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 
 		$plugin->generate_block_rules();
 		$this->assertEquals(
-			$plugin->get_rules(), array(
+			$plugin->get_rules(),
+			array(
 				'SetEnvIfNoCase User-Agent "TrueBot" block_bot',
 				'<Limit GET POST HEAD>',
 				'Order Allow,Deny',
@@ -203,16 +245,24 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 	}
 
-	public function test_ajax_get_list() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::load_list
+	 */
+	public function testAjaxGetList() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'check_ajax_referer', array(
+			'check_ajax_referer',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'Niteoweb.SpiderBlocker.Nonce',
@@ -222,13 +272,15 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_send_json_success', array(
+			'wp_send_json_success',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => array(
 					array(
@@ -248,7 +300,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 			)
 		);
@@ -257,16 +310,24 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 	}
 
 
-	public function test_ajax_reset_list() {
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::reset_list
+	 */
+	public function testAjaxResetList() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'check_ajax_referer', array(
+			'check_ajax_referer',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'Niteoweb.SpiderBlocker.Nonce',
@@ -276,13 +337,15 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_send_json_success', array(
+			'wp_send_json_success',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => array(
 					array(
@@ -302,7 +365,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'delete_option', array(
+			'delete_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots' ),
 			)
@@ -313,16 +377,25 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->reset_list();
 	}
 
-	public function test_ajax_save_list() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 */
+	public function testAjaxSaveList() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'check_ajax_referer', array(
+			'check_ajax_referer',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'Niteoweb.SpiderBlocker.Nonce',
@@ -332,13 +405,15 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_send_json_success', array(
+			'wp_send_json_success',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => array(
 					array(
@@ -358,33 +433,38 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots' ),
 				'return' => false,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '*' ),
 				'return' => false,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'sanitize_text_field', array(
+			'sanitize_text_field',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_serialize', array(
+			'maybe_serialize',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'add_option', array(
+			'add_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '', '', 'no' ),
 			)
@@ -397,16 +477,25 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->save_list();
 	}
 
-	public function test_ajax_update_list() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 */
+	public function testAjaxUpdateList() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'check_ajax_referer', array(
+			'check_ajax_referer',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'Niteoweb.SpiderBlocker.Nonce',
@@ -416,13 +505,15 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_send_json_success', array(
+			'wp_send_json_success',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => array(
 					array(
@@ -442,40 +533,46 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots' ),
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '*' ),
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'update_option', array(
+			'update_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '*' ),
 				'return' => true,
 			)
 		);
 		\WP_Mock::wpFunction(
-			'sanitize_text_field', array(
+			'sanitize_text_field',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_serialize', array(
+			'maybe_serialize',
+			array(
 				'called' => 1,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'add_option', array(
+			'add_option',
+			array(
 				'called' => 1,
 				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '', '', 'no' ),
 			)
@@ -486,16 +583,25 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->save_list();
 	}
 
-	public function test_ajax_update_list_invalid() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 */
+	public function testAjaxUpdateListInvalid() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'check_ajax_referer', array(
+			'check_ajax_referer',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'Niteoweb.SpiderBlocker.Nonce',
@@ -505,7 +611,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'wp_send_json_error', array(
+			'wp_send_json_error',
+			array(
 				'called' => 1,
 			)
 		);
@@ -515,16 +622,23 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->save_list();
 	}
 
-	public function test_skip_rules_generation() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 */
+	public function testSkipRulesGeneration() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'get_home_path', array(
+			'get_home_path',
+			array(
 				'return' => '/not_here/',
 			)
 		);
@@ -532,11 +646,17 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->generate_block_rules();
 	}
 
-	public function test_remove_rules_generation() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::remove_block_rules
+	 */
+	public function testRemoveRulesGeneration() {
 		global $wp_rewrite;
 
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
@@ -546,18 +666,21 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'is_admin', array(
+			'is_admin',
+			array(
 				'return' => true,
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'get_home_path', array(
+			'get_home_path',
+			array(
 				'return' => '/tmp/',
 			)
 		);
 		\WP_Mock::wpFunction(
-			'insert_with_markers', array(
+			'insert_with_markers',
+			array(
 				'called' => 1,
 				'args'   => array(
 					'/tmp/.htaccess',
@@ -568,7 +691,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => json_decode(
 					json_encode(
@@ -585,14 +709,16 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 								'desc'  => 'False',
 								'state' => false,
 							),
-						), false
+						),
+						false
 					)
 				),
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 			)
 		);
@@ -600,9 +726,16 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin->remove_block_rules();
 	}
 
-	public function test_robots_filter() {
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::robots_file
+	 */
+	public function testRobotsFilter() {
 		\WP_Mock::wpFunction(
-			'wp_next_scheduled', array(
+			'wp_next_scheduled',
+			array(
 				'return' => true,
 			)
 		);
@@ -610,7 +743,8 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 		$plugin = new SpiderBlocker();
 
 		\WP_Mock::wpFunction(
-			'maybe_unserialize', array(
+			'maybe_unserialize',
+			array(
 				'called' => 1,
 				'return' => json_decode(
 					json_encode(
@@ -627,35 +761,45 @@ class TestBlocker extends \PHPUnit\Framework\TestCase {
 								'desc'  => 'False',
 								'state' => false,
 							),
-						), false
-					), true
+						),
+						false
+					),
+					true
 				),
 			)
 		);
 
 		\WP_Mock::wpFunction(
-			'get_option', array(
+			'get_option',
+			array(
 				'called' => 1,
 				'return' => array( 'one', 'two', 'three' ),
 			)
 		);
 
 		$this->assertEquals(
-			$plugin->robots_file( '', true ), "User-agent: TrueBot\nDisallow: /\n\n"
+			$plugin->robots_file( '', true ),
+			"User-agent: TrueBot\nDisallow: /\n\n"
 		);
 	}
 
-    public function test_view_handler_load() {
-        \WP_Mock::wpFunction(
-            'wp_next_scheduled', array(
-                'return' => true,
-            )
-        );
 
-        $plugin = new SpiderBlocker();
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::view_handler_load
+	 */
+	public function testViewHandlerLoad() {
+		\WP_Mock::wpFunction(
+			'wp_next_scheduled',
+			array(
+				'return' => true,
+			)
+		);
 
-        \WP_Mock::expectActionAdded( 'admin_enqueue_scripts', array( $plugin, 'view_handler_scripts' ) );
-        $plugin->view_handler_load();
-    }
+		$plugin = new SpiderBlocker();
+
+		\WP_Mock::expectActionAdded( 'admin_enqueue_scripts', array( $plugin, 'view_handler_scripts' ) );
+		$plugin->view_handler_load();
+	}
 
 }

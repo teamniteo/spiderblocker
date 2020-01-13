@@ -1,0 +1,18 @@
+on: push
+name: Tests
+
+jobs:
+  onMasterOrPR:
+    name: On master or PR
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install Dependencies
+      run: make ensure
+    - name: Lint
+      run: make fmt
+    - name: Test
+      run: make test
+    - name: Cover
+      run: make cover
+

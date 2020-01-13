@@ -1,0 +1,127 @@
+# Copyright (C) 2020 Easy Blog Networks
+# This file is distributed under the same license as the Spider Blocker plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Spider Blocker @##VERSION##@\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/src\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2020-01-13T09:39:59+05:30\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.3.0\n"
+"X-Domain: spiderblocker\n"
+
+#. Plugin Name of the plugin
+#: index.php:752
+msgid "Spider Blocker"
+msgstr ""
+
+#. Description of the plugin
+msgid "Spider Blocker will block most common bots that consume bandwidth and slow down your server."
+msgstr ""
+
+#. Author of the plugin
+msgid "Easy Blog Networks"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "www.easyblognetworks.com"
+msgstr ""
+
+#: index.php:41
+msgid ""
+"This plugin requires PHP 5.6.0 or higher. Please contact your hosting provider about upgrading your\n"
+"\t\t\tserver software. Your PHP version is"
+msgstr ""
+
+#: index.php:374
+msgid "SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting"
+msgstr ""
+
+#: index.php:374
+msgid "Setting page"
+msgstr ""
+
+#: index.php:399
+msgid "This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software. Your Apache version is"
+msgstr ""
+
+#: index.php:413
+msgid "%1$s %2$s %3$s"
+msgstr ""
+
+#: index.php:414
+msgid "This plugin requires"
+msgstr ""
+
+#: index.php:416
+msgid "file that is writable by the server. Please enable write access for file"
+msgstr ""
+
+#: index.php:574
+msgid "Failed parsing JSON"
+msgstr ""
+
+#: index.php:588
+msgid "Unable to process the request as no data has been received."
+msgstr ""
+
+#: index.php:766
+msgid "Add New Bot"
+msgstr ""
+
+#: index.php:772
+#: index.php:800
+#: index.php:812
+msgid "User Agent"
+msgstr ""
+
+#: index.php:776
+msgid "Bot Name"
+msgstr ""
+
+#: index.php:781
+msgid "Bot Description URL"
+msgstr ""
+
+#: index.php:788
+msgid "Add Bot"
+msgstr ""
+
+#: index.php:791
+msgid "List of bots"
+msgstr ""
+
+#: index.php:793
+msgid "Filter..."
+msgstr ""
+
+#: index.php:802
+#: index.php:813
+msgid "Name"
+msgstr ""
+
+#: index.php:804
+#: index.php:814
+msgid "State"
+msgstr ""
+
+#: index.php:806
+#: index.php:816
+msgid "Action"
+msgstr ""
+
+#: index.php:841
+msgid "Save"
+msgstr ""
+
+#: index.php:842
+msgid "Reset to Defaults"
+msgstr ""
+
+#: index.php:843
+msgid "Import/Export Definitions"
+msgstr ""

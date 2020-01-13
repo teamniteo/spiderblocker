@@ -2,8 +2,8 @@
 Contributors: niteoweb
 Tags: seo, block, bots, htaccess, apache, secure
 Requires at least: 4.0
-Tested up to: 5.1.1
-Stable tag: 1.0.22
+Tested up to: 5.3.2
+Stable tag: 1.2.0
 
 SpiderBlocker will block most common bots that consume bandwidth and slow down your server.
 
@@ -24,3 +24,16 @@ with Apache server and mod_rewrite enabled.
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to **Tools** menu and then **SpiderBlocker* to configure
 4. If you use any other plugin to edit .htaccess file, make sure that content of file is valid
+
+== Frequently Asked Questions ==
+
+
+== Screenshots ==
+
+
+== Changelog ==
+= v1.2.0 =
+- Code clean-up
+- Support for the latest version of WordPress
+
+== Upgrade Notice ==
