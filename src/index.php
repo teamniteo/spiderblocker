@@ -31,15 +31,15 @@ if ( ! function_exists( 'apache_get_version' ) ) {
 }
 
 /**
- * Checks for PHP version and stop the plugin if the version is < 5.3.0.
+ * Checks for PHP version and stop the plugin if the version is < 5.6.0.
  */
-if ( version_compare( PHP_VERSION, '5.3.0', '<' ) ) {
+if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
 	?>
 	<div id="error-page">
 		<p>
 		<?php
 		esc_html_e(
-			'This plugin requires PHP 5.3.0 or higher. Please contact your hosting provider about upgrading your
+			'This plugin requires PHP 5.6.0 or higher. Please contact your hosting provider about upgrading your
 			server software. Your PHP version is',
 			'spiderblocker'
 		);
