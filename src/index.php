@@ -40,7 +40,8 @@ if ( version_compare( PHP_VERSION, '5.3.0', '<' ) ) {
 		<?php
 		esc_html_e(
 			'This plugin requires PHP 5.3.0 or higher. Please contact your hosting provider about upgrading your
-			server software. Your PHP version is', 'spiderblocker'
+			server software. Your PHP version is',
+			'spiderblocker'
 		);
 		?>
 		<b><?php echo sanitize_text_field( PHP_VERSION ); ?></b></p>
@@ -350,7 +351,11 @@ class SpiderBlocker {
 	 */
 	public function admin_menu() {
 		$menu = add_management_page(
-			'SpiderBlocker', 'SpiderBlocker', 'manage_options', 'ni_spider_block', array( &$this, 'view_handler' )
+			'SpiderBlocker',
+			'SpiderBlocker',
+			'manage_options',
+			'ni_spider_block',
+			array( &$this, 'view_handler' )
 		);
 
 		add_action( 'load-' . $menu, array( &$this, 'view_handler_load' ) );
@@ -397,9 +402,9 @@ class SpiderBlocker {
 			die();
 		}
 
-		if ( ! SpiderBlocker::is_htaccess_writable() ) {
-			$state = SpiderBlocker::chmod_htaccess();
-			if ( ! SpiderBlocker::is_htaccess_writable() || ! $state ) {
+		if ( ! self::is_htaccess_writable() ) {
+			$state = self::chmod_htaccess();
+			if ( ! self::is_htaccess_writable() || ! $state ) {
 				?>
 				<div id="error-page">
 					<p>
@@ -428,7 +433,7 @@ class SpiderBlocker {
 	 * @codeCoverageIgnore
 	 */
 	private static function is_htaccess_writable() {
-		$htaccess_file = SpiderBlocker::join_paths( ABSPATH, '.htaccess' );
+		$htaccess_file = self::join_paths( ABSPATH, '.htaccess' );
 		return is_writable( $htaccess_file );
 	}
 
