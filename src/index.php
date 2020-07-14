@@ -13,41 +13,9 @@ namespace Niteoweb\SpiderBlocker;
  * Author URI:  www.easyblognetworks.com
  */
 
-if ( ! function_exists( 'apache_get_version' ) ) {
-	/**
-	 * Fetch the Apache version.
-	 *
-	 * @return string|false
-	 */
-	function apache_get_version() {
-		if ( stristr( $_ENV['SERVER_SOFTWARE'], 'Apache' ) ) {
-			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
-		}
-		if ( stristr( $_SERVER['SERVER_SOFTWARE'], 'Apache' ) ) {
-			return sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] );
-		}
-		return false;
-	}
-}
-
-/**
- * Checks for PHP version and stop the plugin if the version is < 5.6.0.
- */
-if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
-	?>
-	<div id="error-page">
-		<p>
-		<?php
-		esc_html_e(
-			'This plugin requires PHP 5.6.0 or higher. Please contact your hosting provider about upgrading your
-			server software. Your PHP version is',
-			'spiderblocker'
-		);
-		?>
-		<b><?php echo sanitize_text_field( PHP_VERSION ); ?></b></p>
-	</div>
-	<?php
-	die();
+// Exit if ABSPATH is not defined
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**
@@ -58,9 +26,50 @@ if ( version_compare( PHP_VERSION, '5.6.0', '<' ) ) {
  */
 class SpiderBlocker {
 
-	const OPTIONNAME = 'Niteoweb.SpiderBlocker.Bots';
-	const NONCE      = 'Niteoweb.SpiderBlocker.Nonce';
-	const CHECKHOOK  = 'Niteoweb.SpiderBlocker.CheckHook';
+	/**
+	 * @var string
+	 */
+	public const PLUGIN_NAME = 'Spider Blocker';
+
+	/**
+	 * @var string
+	 */
+	public const PLUGIN_BASE = 'spiderblocker/index.php';
+
+	/**
+	 * @var string
+	 */
+	public const VERSION = '@##VERSION##@';
+
+	/**
+	 * @var string
+	 */
+	public const MINIMUM_PHP_VERSION = '5.6';
+
+	/**
+	 * @var string
+	 */
+	public const MINIMUM_WP_VERSION = '4.2.0';
+
+	/**
+	 * @var string
+	 */
+	public const OPTIONNAME = 'Niteoweb.SpiderBlocker.Bots';
+
+	/**
+	 * @var string
+	 */
+	public const NONCE = 'Niteoweb.SpiderBlocker.Nonce';
+
+	/**
+	 * @var string
+	 */
+	public const CHECKHOOK = 'Niteoweb.SpiderBlocker.CheckHook';
+
+	/**
+	 * @var array
+	 */
+	public $notices = array();
 
 	/**
 	 * Bots which can be blocked by the spiderblocker plugin
@@ -308,18 +317,138 @@ class SpiderBlocker {
 	 * Class Constructor.
 	 */
 	public function __construct() {
-		if ( is_admin() ) {
-			add_action( 'admin_notices', array( &$this, 'activate_plugin_notice' ) );
-			add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
-			add_action( 'wp_ajax_NSB-get_list', array( &$this, 'load_list' ) );
-			add_action( 'wp_ajax_NSB-set_list', array( &$this, 'save_list' ) );
-			add_action( 'wp_ajax_NSB-reset_list', array( &$this, 'reset_list' ) );
+		add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
+
+		add_action( 'admin_init', array( $this, 'check_environment' ) );
+		add_action( 'admin_init', array( $this, 'check_server' ) );
+		add_action( 'admin_init', array( $this, 'add_plugin_notices' ) );
+		add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
+
+		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+		add_action( 'wp_ajax_NSB-get_list', array( &$this, 'load_list' ) );
+		add_action( 'wp_ajax_NSB-set_list', array( &$this, 'save_list' ) );
+		add_action( 'wp_ajax_NSB-reset_list', array( &$this, 'reset_list' ) );
+		add_action( 'generate_rewrite_rules', array( &$this, 'generate_rewrite_rules' ) );
+	}
+
+	/**
+	 * Checks the environment on loading WordPress, just in case the environment changes after activation.
+	 */
+	public function check_environment() {
+		if ( $this->is_environment_compatible() ) {
+			return;
 		}
 
-		// Filter for Robots file.
-		add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
-		add_action( 'generate_rewrite_rules', array( &$this, 'generate_rewrite_rules' ) );
+		$this->deactivate_plugin();
+		$this->add_admin_notice( 'bad_environment', 'error', $this->get_plugin_name() . ' has been deactivated. ' . $this->get_environment_message() );
+	}
 
+	/**
+	 * Checks for server and .htaccess write permissions.
+	 */
+	public function check_server() {
+		// Check Apache version
+		if ( ! $this->apache_get_version() ) {
+			$this->deactivate_plugin();
+			$this->add_admin_notice(
+				'no_apache',
+				'error',
+				sprintf(
+					esc_html__( '%s requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software.', 'spiderblocker' ),
+					$this->get_plugin_name()
+				)
+			);
+		}
+
+		// Write permission for .htaccess
+		$state = self::chmod_htaccess();
+
+		if ( ! self::is_htaccess_writable() || ! $state ) {
+			$this->deactivate_plugin();
+			$this->add_admin_notice(
+				'no_htaccess',
+				'error',
+				sprintf(
+					esc_html__( '%s requires .htaccess file that is writable by the server. Please enable write access for the file.', 'spiderblocker' ),
+					$this->get_plugin_name()
+				)
+			);
+		}
+	}
+
+	/**
+	 * Adds notices for out-of-date WordPress and/or WooCommerce versions.
+	 */
+	public function add_plugin_notices() {
+		// Check for WP version
+		if ( ! $this->is_wp_compatible() ) {
+			$this->add_admin_notice(
+				'update_wordpress',
+				'error',
+				sprintf(
+					esc_html__( '%1$s requires WordPress version %2$s or higher. Please %3$supdate WordPress &raquo;%4$s', 'spiderblocker' ),
+					$this->get_plugin_name(),
+					$this->get_wp_version(),
+					'<a href="' . esc_url( admin_url( 'update-core.php' ) ) . '">',
+					'</a>'
+				)
+			);
+		}
+
+		// Check for plugin activation
+		if ( $this->activate_plugin_notice() ) {
+			$this->add_admin_notice(
+				'plugin_activated',
+				'success',
+				sprintf(
+					esc_html__( '%1$s plugin has enabled blocking of some bots, please review settings by visiting %2$sSettings page%3$s!', 'spiderblocker' ),
+					$this->get_plugin_name(),
+					'<a href="' . esc_url( admin_url( 'tools.php?page=ni_spider_block' ) ) . '">',
+					'</a>'
+				)
+			);
+		}
+	}
+
+	/**
+	 * Admin notice which gets fired on plugin activation.
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function activate_plugin_notice() {
+		if ( get_option( self::OPTIONNAME, false ) ) {
+			return false;
+		}
+
+		// Add option to DB and return true
+		update_option( self::OPTIONNAME, $this->default_bots );
+
+		return true;
+	}
+
+	/**
+	 * Displays any admin notices added with add_admin_notice()
+	 */
+	public function admin_notices() {
+		foreach ( (array) $this->notices as $notice_key => $notice ) {
+			echo '<div class="notice notice-' . esc_attr( $notice['class'] ) . '">';
+			echo '<p>' . wp_kses( $notice['message'], array( 'a' => array( 'href' => array() ) ) ) . '</p>';
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Adds an admin notice to be displayed.
+	 *
+	 * @param string $slug the slug for the notice
+	 * @param string $class the css class for the notice
+	 * @param string $message the notice message
+	 */
+	private function add_admin_notice( $slug, $class, $message ) {
+		$this->notices[ $slug ] = array(
+			'class'   => $class,
+			'message' => $message,
+		);
 	}
 
 	/**
@@ -362,22 +491,6 @@ class SpiderBlocker {
 	}
 
 	/**
-	 * Admin notice which gets fired on plugin activation.
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function activate_plugin_notice() {
-		if ( get_option( self::OPTIONNAME ) === false ) {
-			update_option( self::OPTIONNAME, $this->default_bots );
-			?>
-			<div class="notice notice-success">
-				<p><?php esc_html_e( 'SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting', 'spiderblocker' ); ?> <a href="<?php echo esc_url( admin_url( 'tools.php?page=ni_spider_block' ) ); ?>"><?php esc_html_e( 'Setting page', 'spiderblocker' ); ?></a>!</p>
-			</div>
-			<?php
-		}
-	}
-
-	/**
 	 * Generate block rules when the download process for a plugin
 	 * install or update finishes.
 	 *
@@ -393,37 +506,7 @@ class SpiderBlocker {
 	 * @codeCoverageIgnore
 	 */
 	public function activate_plugin() {
-		if ( ! apache_get_version() ) {
-			?>
-			<div id="error-page">
-				<p><?php esc_html_e( 'This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software. Your Apache version is', 'spiderblocker' ); ?> <b><?php echo esc_html( apache_get_version() ); ?></b></p>
-			</div>
-			<?php
-			die();
-		}
-
-		if ( ! self::is_htaccess_writable() ) {
-			$state = self::chmod_htaccess();
-			if ( ! self::is_htaccess_writable() || ! $state ) {
-				?>
-				<div id="error-page">
-					<p>
-					<?php
-					printf(
-						esc_html__( '%1$s %2$s %3$s', 'spiderblocker' ),
-						esc_html__( 'This plugin requires', 'spiderblocker' ),
-						'<b>.htaccess</b>',
-						esc_html__( 'file that is writable by the server. Please enable write access for file', 'spiderblocker' )
-					);
-					?>
-						<b><?php echo esc_html( ABSPATH . '.htaccess' ); ?></b>.</p>
-				</div>
-				<?php
-				die();
-			}
-		}
 		$this->generate_block_rules();
-
 	}
 
 	/**
@@ -865,17 +948,104 @@ class SpiderBlocker {
 		wp_enqueue_style( 'thickbox' );
 	}
 
+	/**
+	 * Determines if the server environment is compatible with this plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_environment_compatible() {
+		return version_compare( PHP_VERSION, $this->get_php_version(), '>=' );
+	}
+
+	/**
+	 * Gets the message for display when the environment is incompatible with this plugin.
+	 *
+	 * @return string
+	 */
+	public function get_environment_message() {
+		return sprintf(
+			esc_html__( 'The minimum PHP version required for this plugin is %1$s. You are running %2$s.', 'eu-vat-b2b-taxes' ),
+			$this->get_php_version(),
+			PHP_VERSION
+		);
+	}
+
+	/**
+	 * Determines if the WordPress compatible.
+	 *
+	 * @return bool
+	 */
+	public function is_wp_compatible() {
+		if ( ! $this->get_wp_version() ) {
+			return true;
+		}
+
+		return version_compare( get_bloginfo( 'version' ), $this->get_wp_version(), '>=' );
+	}
+
+	/**
+	 * Returns PLUGIN_NAME.
+	 */
+	public function get_plugin_name() {
+		return self::PLUGIN_NAME;
+	}
+
+	/**
+	 * Returns PLUGIN_BASE.
+	 */
+	public function get_plugin_base() {
+		return self::PLUGIN_BASE;
+	}
+
+	/**
+	 * Returns MINIMUM_PHP_VERSION.
+	 */
+	public function get_php_version() {
+		return self::MINIMUM_PHP_VERSION;
+	}
+
+	/**
+	 * Returns MINIMUM_WP_VERSION.
+	 */
+	public function get_wp_version() {
+		return self::MINIMUM_WP_VERSION;
+	}
+
+	/**
+	 * Deactivates the plugin.
+	 */
+	protected function deactivate_plugin() {
+		deactivate_plugins( $this->get_plugin_base() );
+
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+	}
+
+	/**
+	 * Fetch the Apache version.
+	 *
+	 * @return string|false
+	 */
+	protected function apache_get_version() {
+		if ( stristr( $_ENV['SERVER_SOFTWARE'], 'Apache' ) ) {
+			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
+		}
+
+		if ( stristr( $_SERVER['SERVER_SOFTWARE'], 'Apache' ) ) {
+			return sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] );
+		}
+
+		return false;
+	}
+
 }
 
-// Initialize Plugin.
-if ( defined( 'ABSPATH' ) ) {
-	$niteo_spider_blocker = new SpiderBlocker();
+// Initialize plugin and register hooks
+$spiderblocker = new SpiderBlocker();
 
-	add_action( 'upgrader_process_complete', array( &$niteo_spider_blocker, 'on_plugin_upgrade' ), 10, 2 );
+add_action( 'upgrader_process_complete', array( $spiderblocker, 'on_plugin_upgrade' ), 10, 2 );
 
-	// Activation Hook.
-	register_activation_hook( __FILE__, array( &$niteo_spider_blocker, 'activate_plugin' ) );
-
-	// Deactivation Hook.
-	register_deactivation_hook( __FILE__, array( &$niteo_spider_blocker, 'remove_block_rules' ) );
-}
+// Runs on plugin activation & de-activation
+register_activation_hook( __FILE__, array( $spiderblocker, 'activate_plugin' ) );
+register_deactivation_hook( __FILE__, array( $spiderblocker, 'remove_block_rules' ) );
