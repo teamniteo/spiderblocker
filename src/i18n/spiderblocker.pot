@@ -9,13 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-01-13T09:39:59+05:30\n"
+"POT-Creation-Date: 2020-07-15T15:30:39+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.3.0\n"
+"X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: spiderblocker\n"
 
 #. Plugin Name of the plugin
-#: index.php:752
+#: inc/templates/settings.php:10
 msgid "Spider Blocker"
 msgstr ""
 
@@ -31,97 +31,115 @@ msgstr ""
 msgid "www.easyblognetworks.com"
 msgstr ""
 
-#: index.php:41
-msgid ""
-"This plugin requires PHP 5.6.0 or higher. Please contact your hosting provider about upgrading your\n"
-"\t\t\tserver software. Your PHP version is"
-msgstr ""
-
-#: index.php:374
-msgid "SpiderBlocker plugin has enabled blocking of some bots, please review settings by visiting"
-msgstr ""
-
-#: index.php:374
-msgid "Setting page"
-msgstr ""
-
-#: index.php:399
-msgid "This plugin requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software. Your Apache version is"
-msgstr ""
-
-#: index.php:413
-msgid "%1$s %2$s %3$s"
-msgstr ""
-
-#: index.php:414
-msgid "This plugin requires"
-msgstr ""
-
-#: index.php:416
-msgid "file that is writable by the server. Please enable write access for file"
-msgstr ""
-
-#: index.php:574
-msgid "Failed parsing JSON"
-msgstr ""
-
-#: index.php:588
-msgid "Unable to process the request as no data has been received."
-msgstr ""
-
-#: index.php:766
+#: inc/templates/settings.php:25
 msgid "Add New Bot"
 msgstr ""
 
-#: index.php:772
-#: index.php:800
-#: index.php:812
+#: inc/templates/settings.php:31
+#: inc/templates/settings.php:65
+#: inc/templates/settings.php:86
 msgid "User Agent"
 msgstr ""
 
-#: index.php:776
+#: inc/templates/settings.php:35
 msgid "Bot Name"
 msgstr ""
 
-#: index.php:781
+#: inc/templates/settings.php:40
 msgid "Bot Description URL"
 msgstr ""
 
-#: index.php:788
+#: inc/templates/settings.php:48
 msgid "Add Bot"
 msgstr ""
 
-#: index.php:791
+#: inc/templates/settings.php:53
 msgid "List of bots"
 msgstr ""
 
-#: index.php:793
+#: inc/templates/settings.php:56
 msgid "Filter..."
 msgstr ""
 
-#: index.php:802
-#: index.php:813
+#: inc/templates/settings.php:69
+#: inc/templates/settings.php:90
 msgid "Name"
 msgstr ""
 
-#: index.php:804
-#: index.php:814
+#: inc/templates/settings.php:73
+#: inc/templates/settings.php:94
 msgid "State"
 msgstr ""
 
-#: index.php:806
-#: index.php:816
+#: inc/templates/settings.php:77
+#: inc/templates/settings.php:98
 msgid "Action"
 msgstr ""
 
-#: index.php:841
+#: inc/templates/settings.php:111
+msgid "Block"
+msgstr ""
+
+#: inc/templates/settings.php:112
+msgid "Allow"
+msgstr ""
+
+#: inc/templates/settings.php:113
+msgid "Remove"
+msgstr ""
+
+#: inc/templates/settings.php:124
 msgid "Save"
 msgstr ""
 
-#: index.php:842
+#: inc/templates/settings.php:125
 msgid "Reset to Defaults"
 msgstr ""
 
-#: index.php:843
+#: inc/templates/settings.php:126
 msgid "Import/Export Definitions"
+msgstr ""
+
+#: index.php:357
+msgid "%s requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software."
+msgstr ""
+
+#: index.php:372
+msgid "%s requires .htaccess file that is writable by the server. Please enable write access for the file."
+msgstr ""
+
+#: index.php:389
+msgid "%1$s requires WordPress version %2$s or higher. Please %3$supdate WordPress &raquo;%4$s"
+msgstr ""
+
+#: index.php:404
+msgid "%1$s plugin has enabled blocking of some bots, please review settings by visiting %2$sSettings page%3$s!"
+msgstr ""
+
+#: index.php:657
+msgid "Failed parsing JSON"
+msgstr ""
+
+#: index.php:671
+msgid "Unable to process the request as no data has been received."
+msgstr ""
+
+#: index.php:725
+msgid "List of bots was saved and new blocklist applied!"
+msgstr ""
+
+#: index.php:726
+msgid "List of bots was reset to defaults!"
+msgstr ""
+
+#: index.php:727
+msgid "Bot"
+msgstr ""
+
+#: index.php:728
+msgid "was added!"
+msgstr ""
+
+#: index.php:729
+msgid "Bot was removed!"
 msgstr ""
