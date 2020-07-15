@@ -87,6 +87,22 @@ class BlockerTest extends TestCase {
 
 	/**
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::check_server
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::deactivate_plugin
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_admin_notice
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_base
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_name
+	 */
+	public function testCheckServer() {
+		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
+		$mock->shouldAllowMockingProtectedMethods();
+		$mock->shouldReceive( 'get_server_software', 'is_htaccess_writable' )->andReturn( false );
+
+		$mock->check_server();
+	}
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_plugin_notices
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_wp_compatible
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_admin_notice
@@ -514,6 +530,42 @@ class BlockerTest extends TestCase {
 
 	/**
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 */
+	public function testAjaxSaveListNoData() {
+		$plugin = new SpiderBlocker();
+
+		\WP_Mock::userFunction(
+			'wp_send_json_error',
+			array(
+				'return' => true,
+			)
+		);
+
+		$this->assertEmpty( $plugin->save_list() );
+	}
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 */
+	public function testAjaxSaveListEmptyData() {
+		$plugin = new SpiderBlocker();
+
+		$_POST['data'] = '';
+
+		\WP_Mock::userFunction(
+			'wp_send_json_error',
+			array(
+				'return' => true,
+			)
+		);
+
+		$this->assertEmpty( $plugin->save_list() );
+	}
+
+	/**
+	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
@@ -692,10 +744,10 @@ class BlockerTest extends TestCase {
 		);
 
 		\WP_Mock::wpFunction(
-			'add_option',
+			'update_option',
 			array(
 				'called' => 1,
-				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '', '', 'no' ),
+				'args'   => array( 'Niteoweb.SpiderBlocker.Bots', '', 'no' ),
 			)
 		);
 
@@ -735,7 +787,6 @@ class BlockerTest extends TestCase {
 
 		$plugin->save_list();
 	}
-
 
 	/**
 	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct

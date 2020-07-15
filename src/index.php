@@ -356,9 +356,7 @@ class SpiderBlocker {
 		}
 
 		// Write permission for .htaccess
-		$state = self::chmod_htaccess();
-
-		if ( ! self::is_htaccess_writable() || ! $state ) {
+		if ( ! $this->is_htaccess_writable() || ! $this->chmod_htaccess() ) {
 			$this->deactivate_plugin();
 			$this->add_admin_notice(
 				'no_htaccess',
@@ -502,49 +500,6 @@ class SpiderBlocker {
 	}
 
 	/**
-	 * Check if the .htaccess file is writable.
-	 *
-	 * @return bool
-	 * @codeCoverageIgnore
-	 */
-	private static function is_htaccess_writable() {
-		$htaccess_file = self::join_paths( ABSPATH, '.htaccess' );
-		return is_writable( $htaccess_file );
-	}
-
-	/**
-	 * Function to join the supplied arguments together.
-	 *
-	 * @return string
-	 * @codeCoverageIgnore
-	 */
-	private static function join_paths() {
-		$paths = array();
-
-		foreach ( func_get_args() as $arg ) {
-			if ( '' !== $arg ) {
-				$paths[] = $arg;
-			}
-		}
-
-		return preg_replace( '#/+#', '/', join( '/', $paths ) );
-	}
-
-	/**
-	 * Change file permission of the .htaccess file.
-	 *
-	 * @param int $mod octet value for chmod.
-	 * @return bool
-	 * @codeCoverageIgnore
-	 */
-	private static function chmod_htaccess( $mod = 0644 ) {
-		$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
-		$htaccess_file = $home_path . '.htaccess';
-
-		return chmod( $htaccess_file, $mod );
-	}
-
-	/**
 	 * Add our rules for bots in the .htaccess file.
 	 */
 	public function generate_block_rules() {
@@ -639,29 +594,34 @@ class SpiderBlocker {
 	 */
 	public function save_list() {
 		check_ajax_referer( self::NONCE, 'nonce' );
-		if ( isset( $_POST['data'] ) && '' !== $_POST['data'] ) {
-			$data = json_decode( stripcslashes( $_POST['data'] ), true );
 
-			if ( json_last_error() ) {
-				if ( function_exists( 'json_last_error_msg' ) ) {
-					wp_send_json_error( json_last_error_msg() );
-				} else {
-					wp_send_json_error( esc_html__( 'Failed parsing JSON', 'spiderblocker' ) );
-				}
-			}
-
-			if ( get_option( self::OPTIONNAME ) !== false ) {
-				update_option( self::OPTIONNAME, maybe_serialize( $data ) );
-			} else {
-				add_option( self::OPTIONNAME, maybe_serialize( $data ), '', 'no' );
-			}
-
-			$this->generate_block_rules();
-			add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
-			wp_send_json_success( $this->get_bots() );
-		} else {
+		if ( ! isset( $_POST['data'] ) ) {
 			wp_send_json_error( esc_html__( 'Unable to process the request as no data has been received.', 'spiderblocker' ) );
+			return;
 		}
+
+		if ( empty( $_POST['data'] ) ) {
+			wp_send_json_error( esc_html__( 'Unable to process the request as no data has been received.', 'spiderblocker' ) );
+			return;
+		}
+
+		$data = json_decode( stripcslashes( $_POST['data'] ), true );
+
+		if ( json_last_error() ) {
+			wp_send_json_error( esc_html__( 'Failed parsing JSON data.', 'spiderblocker' ) );
+			return;
+		}
+
+		update_option( self::OPTIONNAME, maybe_serialize( $data ), 'no' );
+
+		// Add rule to .htaccess file
+		$this->generate_block_rules();
+
+		// Update robots_txt file
+		add_filter( 'robots_txt', array( &$this, 'robots_file' ), ~PHP_INT_MAX, 2 );
+
+		// Send success response
+		wp_send_json_success( $this->get_bots() );
 	}
 
 	/**
@@ -817,6 +777,49 @@ class SpiderBlocker {
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
+	}
+
+	/**
+	 * Change file permission of the .htaccess file.
+	 *
+	 * @param int $mod octet value for chmod.
+	 * @return bool
+	 * @codeCoverageIgnore
+	 */
+	protected function chmod_htaccess( $mod = 0644 ) {
+		$home_path     = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
+		$htaccess_file = $home_path . '.htaccess';
+
+		return chmod( $htaccess_file, $mod );
+	}
+
+	/**
+	 * Check if the .htaccess file is writable.
+	 *
+	 * @return bool
+	 * @codeCoverageIgnore
+	 */
+	protected function is_htaccess_writable() {
+		$htaccess_file = self::join_paths( ABSPATH, '.htaccess' );
+		return is_writable( $htaccess_file );
+	}
+
+	/**
+	 * Function to join the supplied arguments together.
+	 *
+	 * @return string
+	 * @codeCoverageIgnore
+	 */
+	private static function join_paths() {
+		$paths = array();
+
+		foreach ( func_get_args() as $arg ) {
+			if ( '' !== $arg ) {
+				$paths[] = $arg;
+			}
+		}
+
+		return preg_replace( '#/+#', '/', join( '/', $paths ) );
 	}
 
 }
