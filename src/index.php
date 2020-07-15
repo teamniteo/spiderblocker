@@ -13,11 +13,6 @@ namespace Niteoweb\SpiderBlocker;
  * Author URI:  www.easyblognetworks.com
  */
 
-// Exit if ABSPATH is not defined
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 /**
  * Spiderblocker class where all the action happens.
  *
@@ -412,8 +407,6 @@ class SpiderBlocker {
 
 	/**
 	 * Admin notice which gets fired on plugin activation.
-	 *
-	 * @codeCoverageIgnore
 	 */
 	public function activate_plugin_notice() {
 		if ( get_option( self::OPTIONNAME, false ) ) {
@@ -466,9 +459,8 @@ class SpiderBlocker {
 	 * Fetch Plugin URL.
 	 *
 	 * @return string
-	 * @codeCoverageIgnore
 	 */
-	private function plugin_url() {
+	public function plugin_url() {
 		$url = wp_make_link_relative( plugin_dir_url( __FILE__ ) );
 		$url = ltrim( $url, '/' );
 
@@ -800,22 +792,11 @@ class SpiderBlocker {
 	}
 
 	/**
-	 * Deactivates the plugin.
-	 */
-	protected function deactivate_plugin() {
-		deactivate_plugins( $this->get_plugin_base() );
-
-		if ( isset( $_GET['activate'] ) ) {
-			unset( $_GET['activate'] );
-		}
-	}
-
-	/**
 	 * Fetch the Apache version.
 	 *
 	 * @return string|false
 	 */
-	protected function get_server_software() {
+	public function get_server_software() {
 		if ( stristr( $_ENV['SERVER_SOFTWARE'], 'Apache' ) ) {
 			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
 		}
@@ -827,13 +808,27 @@ class SpiderBlocker {
 		return false;
 	}
 
+	/**
+	 * Deactivates the plugin.
+	 */
+	protected function deactivate_plugin() {
+		deactivate_plugins( $this->get_plugin_base() );
+
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+	}
+
 }
 
-// Initialize plugin and register hooks
-$spiderblocker = new SpiderBlocker();
+// Initlaize if called from within WordPress
+if ( defined( 'ABSPATH' ) ) {
+	$spiderblocker = new SpiderBlocker();
 
-add_action( 'upgrader_process_complete', array( $spiderblocker, 'on_plugin_upgrade' ), 10, 2 );
+	// Register hooks
+	add_action( 'upgrader_process_complete', array( $spiderblocker, 'on_plugin_upgrade' ), 10, 2 );
 
-// Runs on plugin activation & de-activation
-register_activation_hook( __FILE__, array( $spiderblocker, 'activate_plugin' ) );
-register_deactivation_hook( __FILE__, array( $spiderblocker, 'remove_block_rules' ) );
+	// Runs on plugin activation & de-activation
+	register_activation_hook( __FILE__, array( $spiderblocker, 'activate_plugin' ) );
+	register_deactivation_hook( __FILE__, array( $spiderblocker, 'remove_block_rules' ) );
+}

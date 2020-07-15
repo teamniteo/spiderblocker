@@ -4,6 +4,10 @@
  * View for plugin settings panel.
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 
 <div class="spiderblocker-root">
