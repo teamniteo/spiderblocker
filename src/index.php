@@ -39,7 +39,7 @@ class SpiderBlocker {
 	/**
 	 * @var string
 	 */
-	public const VERSION = '@##VERSION##@';
+	public const PLUGIN_VERSION = '@##VERSION##@';
 
 	/**
 	 * @var string
@@ -324,11 +324,11 @@ class SpiderBlocker {
 		add_action( 'admin_init', array( $this, 'add_plugin_notices' ) );
 		add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 
-		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
-		add_action( 'wp_ajax_NSB-get_list', array( &$this, 'load_list' ) );
-		add_action( 'wp_ajax_NSB-set_list', array( &$this, 'save_list' ) );
-		add_action( 'wp_ajax_NSB-reset_list', array( &$this, 'reset_list' ) );
-		add_action( 'generate_rewrite_rules', array( &$this, 'generate_rewrite_rules' ) );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+		add_action( 'wp_ajax_NSB-get_list', array( $this, 'load_list' ) );
+		add_action( 'wp_ajax_NSB-set_list', array( $this, 'save_list' ) );
+		add_action( 'wp_ajax_NSB-reset_list', array( $this, 'reset_list' ) );
+		add_action( 'generate_rewrite_rules', array( $this, 'generate_rewrite_rules' ) );
 	}
 
 	/**
@@ -348,7 +348,7 @@ class SpiderBlocker {
 	 */
 	public function check_server() {
 		// Check Apache version
-		if ( ! $this->apache_get_version() ) {
+		if ( ! $this->get_server_software() ) {
 			$this->deactivate_plugin();
 			$this->add_admin_notice(
 				'no_apache',
@@ -701,233 +701,7 @@ class SpiderBlocker {
 	 * @codeCoverageIgnore
 	 */
 	public function view_handler() {
-		?>
-		<style>
-			.notice.fixed {
-				position: fixed;
-				right: 1em;
-				top: 3.5em;
-			}
-
-			tr.active {
-				background-color: rgba(54, 204, 255, 0.05);
-			}
-
-			.active th.bot-re {
-				border-left: 4px solid #2ea2cc;
-			}
-		</style>
-
-		<script>
-			window.sb_nonce = "<?php echo esc_html( wp_create_nonce( self::NONCE ) ); ?>";
-			-(function () {
-				var spiderBlockApp = angular.module('spiderBlockApp', []);
-
-				spiderBlockApp.directive('jsonText', function () {
-					return {
-						restrict: 'A',
-						require: 'ngModel',
-						link: function (scope, element, attr, ngModel) {
-							function into(input) {
-								return angular.fromJson(input);
-							}
-
-							function out(data) {
-								return angular.toJson(data, true);
-							}
-
-							ngModel.$parsers.push(into);
-							ngModel.$formatters.push(out);
-						}
-					};
-				});
-				spiderBlockApp.controller('NotificationsCtrl', function ($scope, $rootScope, $timeout) {
-					$scope.notifications = [];
-
-					$rootScope.$on('notification', function (event, data) {
-						$scope.notifications.push(data);
-						$timeout(function () {
-							$scope.removeNotification(data);
-						}, 3000);
-					});
-
-					$scope.removeNotification = function (notification) {
-						var index;
-						if ($scope.notifications !== undefined) {
-							index = $scope.notifications.indexOf(notification);
-							$scope.notifications.splice(index, 1);
-						}
-					}
-				});
-				spiderBlockApp.controller('BotListCtrl', function ($scope, $http, $rootScope) {
-					var wp_ajax = function (_req) {
-						_req.nonce = window.sb_nonce;
-						return $http({
-							method: 'POST',
-							url: ajaxurl,
-							data: jQuery.param(_req),
-							headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-						})
-					};
-
-					var find_bot = function (re) {
-						for (var i = $scope.bots.length - 1; i >= 0; i--) {
-							if ($scope.bots[i]['re'] == re) {
-								return i;
-							}
-						}
-						return null;
-					};
-
-					$scope.bot = {"state": true};
-
-					wp_ajax({
-						action: 'NSB-get_list'
-					}).success(function (res) {
-						$scope.bots = res.data;
-					});
-
-					$scope.save = function () {
-						wp_ajax({
-							action: 'NSB-set_list',
-							data: angular.toJson($scope.bots)
-						}).success(function (res) {
-							if (res.success) {
-								$scope.bots = res.data;
-								$rootScope.$emit('notification', {
-									state: 'success',
-									msg: 'List of bots was saved and new blocklist applied!'
-								});
-							} else {
-								$rootScope.$emit('notification', {state: 'errror', msg: res.data});
-							}
-						});
-					};
-
-					$scope.reset = function () {
-						wp_ajax({
-							action: 'NSB-reset_list'
-						}).success(function (res) {
-							$scope.bots = res.data;
-							$rootScope.$emit('notification', {
-								state: 'success',
-								msg: 'List of bots was reset to defaults!'
-							});
-						});
-					};
-
-					$scope.add = function () {
-						$scope.bots.push($scope.bot);
-						$rootScope.$emit('notification', {
-							state: 'success',
-							msg: 'Bot ' + $scope.bot.name + ' was added!'
-						});
-						$scope.bot = {"state": true};
-					};
-
-					$scope.remove = function (at) {
-						$rootScope.$emit('notification', {state: 'success', msg: 'Bot was removed!'});
-						$scope.bots.splice(find_bot(at), 1);
-					};
-				});
-			})(angular, document, jQuery);
-		</script>
-		<h1><?php esc_html_e( 'Spider Blocker', 'spiderblocker' ); ?></h1>
-		<hr/>
-		<div ng-app="spiderBlockApp">
-			<div ng-controller="NotificationsCtrl">
-				<div class="notice notice-{{ n.state }} fixed" ng-repeat="n in notifications" style="top: {{3.5*($index+1)}}em">
-					<p>{{n.msg}}
-						<a ng-click="removeNotification(notification)">
-							<span class="dashicons dashicons-no-alt"></span>
-						</a>
-					</p>
-				</div>
-			</div>
-
-			<div ng-controller="BotListCtrl">
-				<h2><?php esc_html_e( 'Add New Bot', 'spiderblocker' ); ?></h2>
-
-				<form name="add_form" ng-submit="add()">
-					<table class="form-table">
-						<tbody>
-						<tr>
-							<th scope="row"><label><?php esc_html_e( 'User Agent', 'spiderblocker' ); ?></label></th>
-							<td><input bots="bots" ng-model='bot.re' class="regular-text" required/></td>
-						</tr>
-						<tr>
-							<th scope="row"><label><?php esc_html_e( 'Bot Name', 'spiderblocker' ); ?></label></th>
-							<td><input type="text" ng-model='bot.name' class="regular-text" required/></td>
-						</tr>
-						<tr>
-						<tr>
-							<th scope="row"><label><?php esc_html_e( 'Bot Description URL', 'spiderblocker' ); ?></label></th>
-							<td><input type="url" ng-model='bot.desc' class="regular-text" placeholder="http://"/>
-							</td>
-						</tr>
-						</tbody>
-					</table>
-
-					<p class="submit"><input ng-disabled="add_form.$invalid" type="submit" class="button button-primary" value="<?php esc_attr_e( 'Add Bot', 'spiderblocker' ); ?>"></p>
-				</form>
-
-				<h2><?php esc_html_e( 'List of bots', 'spiderblocker' ); ?></h2>
-				<ng-form class="search-box">
-					<input size="35" type="search" id="ua-search-input" ng-model="query" placeholder="<?php esc_attr_e( 'Filter...', 'spiderblocker' ); ?>">
-				</ng-form>
-
-				<table class="wp-list-table widefat bots">
-					<thead>
-					<tr>
-						<th scope="col" class="manage-column column-description">
-							<a href="" ng-click="predicate = 're'; reverse=false"><?php esc_html_e( 'User Agent', 'spiderblocker' ); ?> <span class="dashicons dashicons-sort"></span></a>
-						</th>
-						<th scope="col" class="manage-column column-name"><?php esc_html_e( 'Name', 'spiderblocker' ); ?></th>
-						<th scope="col" class="manage-column column-state">
-							<a href="" ng-click="predicate = 'state'; reverse=false"><?php esc_html_e( 'State', 'spiderblocker' ); ?> <span class="dashicons dashicons-sort"></span></a>
-						</th>
-						<th scope="col" id="action" class="manage-column column-action"><?php esc_html_e( 'Action', 'spiderblocker' ); ?></th>
-					</tr>
-					</thead>
-
-					<tfoot>
-					<tr>
-						<th scope="col" class="manage-column column-description"><a href="" ng-click="predicate = 're'; reverse=false"><?php esc_html_e( 'User Agent', 'spiderblocker' ); ?></a></th>
-						<th scope="col" class="manage-column column-name"><?php esc_html_e( 'Name', 'spiderblocker' ); ?></th>
-						<th scope="col" class="manage-column column-state"><a href="" ng-click="predicate = 'state'; reverse=false"><?php esc_html_e( 'State', 'spiderblocker' ); ?></a>
-						</th>
-						<th scope="col" id="action" class="manage-column column-action"><?php esc_html_e( 'Action', 'spiderblocker' ); ?></th>
-					</tr>
-					</tfoot>
-
-					<tbody id="the-list">
-					<tr id="spider-blocker" ng-repeat="bot in bots | filter:query | orderBy:predicate:reverse"
-						ng-class="{'active': bot.state}">
-
-						<th class="bot-re"> {{ bot.re }}</th>
-						<td class="bot-title"><strong>{{ bot.name }}</strong> <a target="_blank" ng-href="{{bot.desc}}">{{ bot.desc }}</a></td>
-						<th class="expression" ng-class="{'blocked':bot.state}"> {{ bot.state?"Blocked":"Allowed" }}</th>
-						<td class="actions">
-							<input ng-hide="bot.state" type="button" ng-click="bot.state=true" class="button button-primary" value="Block">
-							<input ng-show="bot.state" type="button" ng-click="bot.state=false" class="button button-secondary" value="Allow">
-							<input type="button" ng-click="remove(bot.re)" class="button button-secondary" value="Remove">
-						</td>
-					</tr>
-					</tbody>
-				</table>
-
-				<div id="rules-export-import" style="display:none;">
-					<textarea style="-webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;width: 100%;height: 99%;" json-text ng-model="bots"></textarea>
-				</div>
-
-				<p class="submit">
-					<input type="button" class="button button-primary" ng-click="save()" value="<?php esc_attr_e( 'Save', 'spiderblocker' ); ?>">
-					<input type="button" class="button button-primary" ng-click="reset()" value="<?php esc_attr_e( 'Reset to Defaults', 'spiderblocker' ); ?>">
-					<a href="#TB_inline?width=540&height=360&inlineId=rules-export-import" class="thickbox button button-secondary"><?php esc_html_e( 'Import/Export Definitions', 'spiderblocker' ); ?></a>
-				</p>
-			</div>
-		</div>
-		<?php
+		include __DIR__ . '/inc/templates/settings.php';
 	}
 
 	/**
@@ -941,8 +715,22 @@ class SpiderBlocker {
 	 * Registers & Enqueues the admin scripts for the view_handler() function.
 	 */
 	public function view_handler_scripts() {
-		wp_register_script( 'spiderblocker-angular', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), '1.0.18', false );
-		wp_enqueue_script( 'spiderblocker-angular' );
+		wp_enqueue_script( 'spiderblocker-angular', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), self::PLUGIN_VERSION, false );
+		wp_enqueue_script( 'spiderblocker-js', plugin_dir_url( __FILE__ ) . 'assets/js/admin.js', array( 'spiderblocker-angular' ), self::PLUGIN_VERSION, false );
+
+		wp_enqueue_style( 'spiderblocker-css', plugin_dir_url( __FILE__ ) . 'assets/css/admin.css', array(), self::PLUGIN_VERSION );
+
+		$localize = array(
+			'nonce'           => wp_create_nonce( self::NONCE ),
+			'save_text'       => esc_html__( 'List of bots was saved and new blocklist applied!', 'spiderblocker' ),
+			'save_reset_text' => esc_html__( 'List of bots was reset to defaults!', 'spiderblocker' ),
+			'bot_text'        => esc_html__( 'Bot', 'spiderblocker' ),
+			'added_text'      => esc_html__( 'was added!', 'spiderblocker' ),
+			'removed_text'    => esc_html__( 'Bot was removed!', 'spiderblocker' ),
+		);
+
+		// Pass data to JS
+		wp_localize_script( 'spiderblocker-js', 'sb_i18n', $localize );
 
 		wp_enqueue_script( 'thickbox' );
 		wp_enqueue_style( 'thickbox' );
@@ -1027,7 +815,7 @@ class SpiderBlocker {
 	 *
 	 * @return string|false
 	 */
-	protected function apache_get_version() {
+	protected function get_server_software() {
 		if ( stristr( $_ENV['SERVER_SOFTWARE'], 'Apache' ) ) {
 			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
 		}
