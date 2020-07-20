@@ -991,7 +991,7 @@ class BlockerTest extends TestCase {
 
 		$this->assertEquals(
 			'Apache',
-			$plugin->get_server_software()
+			$plugin->get_server_software( 'Apache' )
 		);
 	}
 
@@ -1014,7 +1014,7 @@ class BlockerTest extends TestCase {
 
 		$this->assertEquals(
 			'Apache',
-			$plugin->get_server_software()
+			$plugin->get_server_software( 'Apache' )
 		);
 	}
 
@@ -1028,7 +1028,7 @@ class BlockerTest extends TestCase {
 		$_ENV['SERVER_SOFTWARE']    = '';
 		$_SERVER['SERVER_SOFTWARE'] = '';
 
-		$this->assertFalse( $plugin->get_server_software() );
+		$this->assertFalse( $plugin->get_server_software( 'Apache' ) );
 	}
 
 }

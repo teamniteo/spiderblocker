@@ -343,13 +343,13 @@ class SpiderBlocker {
 	 */
 	public function check_server() {
 		// Check Apache version
-		if ( ! $this->get_server_software() ) {
+		if ( ! $this->get_server_software( 'Apache' ) && ! $this->get_server_software( 'LiteSpeed' ) ) {
 			$this->deactivate_plugin();
 			$this->add_admin_notice(
 				'no_apache',
 				'error',
 				sprintf(
-					esc_html__( '%s requires Apache2 server with mod_rewrite support. Please contact your hosting provider about upgrading your server software.', 'spiderblocker' ),
+					esc_html__( '%s requires Apache2 or LiteSpeed server with mod_rewrite support. Please contact your hosting provider about upgrading your server software.', 'spiderblocker' ),
 					$this->get_plugin_name()
 				)
 			);
@@ -929,12 +929,13 @@ class SpiderBlocker {
 	 *
 	 * @return string|false
 	 */
-	public function get_server_software() {
-		if ( stristr( $_ENV['SERVER_SOFTWARE'], 'Apache' ) ) {
+	public function get_server_software( $server ) {
+		// Check Apache
+		if ( stristr( $_ENV['SERVER_SOFTWARE'], $server ) ) {
 			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
 		}
 
-		if ( stristr( $_SERVER['SERVER_SOFTWARE'], 'Apache' ) ) {
+		if ( stristr( $_SERVER['SERVER_SOFTWARE'], $server ) ) {
 			return sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] );
 		}
 
