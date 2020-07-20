@@ -50,11 +50,11 @@ release:
 	@echo "Go to the https://github.com/niteoweb/spiderblocker/releases/new?tag=v$(VERSION) and publish the release in order to build the package for distribution!"
 
 fmt: ensure
-	bin/phpcbf --standard=WordPress src --ignore=assets
+	bin/phpcbf --standard=WordPress src
 	bin/phpcbf --standard=WordPress tests --ignore=vendor
 
 lint: ensure
-	bin/phpcs --standard=WordPress src --ignore=inc
+	bin/phpcs --standard=WordPress src
 	bin/phpcs --standard=WordPress tests --ignore=vendor
 
 psr:

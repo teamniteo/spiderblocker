@@ -653,6 +653,10 @@ class SpiderBlocker {
 	 * @codeCoverageIgnore
 	 */
 	public function view_handler() {
+		// Load admin assets
+		$this->admin_css();
+		$this->admin_js();
+
 		include __DIR__ . '/inc/templates/settings.php';
 	}
 
@@ -667,10 +671,7 @@ class SpiderBlocker {
 	 * Registers & Enqueues the admin scripts for the view_handler() function.
 	 */
 	public function view_handler_scripts() {
-		wp_enqueue_script( 'spiderblocker-angular', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), self::PLUGIN_VERSION, false );
-		wp_enqueue_script( 'spiderblocker-js', plugin_dir_url( __FILE__ ) . 'assets/js/admin.js', array( 'spiderblocker-angular' ), self::PLUGIN_VERSION, false );
-
-		wp_enqueue_style( 'spiderblocker-css', plugin_dir_url( __FILE__ ) . 'assets/css/admin.css', array(), self::PLUGIN_VERSION );
+		wp_enqueue_script( 'spiderblocker-admin', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js', array( 'jquery' ), self::PLUGIN_VERSION, false );
 
 		$localize = array(
 			'nonce'           => wp_create_nonce( self::NONCE ),
@@ -682,10 +683,182 @@ class SpiderBlocker {
 		);
 
 		// Pass data to JS
-		wp_localize_script( 'spiderblocker-js', 'sb_i18n', $localize );
+		wp_localize_script( 'spiderblocker-admin', 'sb_i18n', $localize );
 
 		wp_enqueue_script( 'thickbox' );
 		wp_enqueue_style( 'thickbox' );
+	}
+
+	/**
+	 * CSS for settings panel.
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function admin_css() {
+		?>
+			<style type="text/css">
+				.spiderblocker-root {
+					margin-right: 20px;
+				}
+				.sb-table-top {
+					display: flex;
+					align-items: center;
+				}
+				.search-box {
+					margin-left: auto;
+				}
+				.form-table th {
+					padding: 10px 10px 10px 0;
+				}
+				.form-table td {
+					padding: 10px;
+				}
+				.notice.fixed {
+					position: fixed;
+					right: 1em;
+					top: 3.5em;
+				}
+				tr.active {
+					background-color: rgba(54, 204, 255, 0.05);
+				}
+				.active th.bot-re {
+					border-left: 4px solid #2ea2cc;
+				}
+
+				@media (max-width: 782px) {
+					.spiderblocker-root {
+						margin-right: 12px;
+					}
+					.form-table td {
+						padding: 10px 0;
+					}
+				}
+			</style>
+		<?php
+	}
+
+	/**
+	 * JS for settings panel.
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function admin_js() {
+		?>
+		<script type="text/javascript">
+			-(function () {
+				var spiderBlockApp = angular.module('spiderBlockApp', []);
+			
+				spiderBlockApp.directive('jsonText', function () {
+					return {
+						restrict: 'A',
+						require: 'ngModel',
+						link: function (scope, element, attr, ngModel) {
+							function into(input) {
+								return angular.fromJson(input);
+							}
+			
+							function out(data) {
+								return angular.toJson(data, true);
+							}
+			
+							ngModel.$parsers.push(into);
+							ngModel.$formatters.push(out);
+						}
+					};
+				});
+				spiderBlockApp.controller('NotificationsCtrl', function ($scope, $rootScope, $timeout) {
+					$scope.notifications = [];
+			
+					$rootScope.$on('notification', function (event, data) {
+						$scope.notifications.push(data);
+						$timeout(function () {
+							$scope.removeNotification(data);
+						}, 3000);
+					});
+			
+					$scope.removeNotification = function (notification) {
+						var index;
+						if ($scope.notifications !== undefined) {
+							index = $scope.notifications.indexOf(notification);
+							$scope.notifications.splice(index, 1);
+						}
+					}
+				});
+				spiderBlockApp.controller('BotListCtrl', function ($scope, $http, $rootScope) {
+					var wp_ajax = function (_req) {
+						_req.nonce = sb_i18n.nonce;
+			
+						return $http({
+							method: 'POST',
+							url: ajaxurl,
+							data: jQuery.param(_req),
+							headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+						})
+					};
+			
+					var find_bot = function (re) {
+						for (var i = $scope.bots.length - 1; i >= 0; i--) {
+							if ($scope.bots[i]['re'] == re) {
+								return i;
+							}
+						}
+						return null;
+					};
+
+					$scope.bot = {"state": true};
+			
+					wp_ajax({
+						action: 'NSB-get_list'
+					}).success(function (res) {
+						$scope.bots = res.data;
+					});
+			
+					$scope.save = function () {
+						wp_ajax({
+							action: 'NSB-set_list',
+							data: angular.toJson($scope.bots)
+						}).success(function (res) {
+							if (res.success) {
+								$scope.bots = res.data;
+								$rootScope.$emit('notification', {
+									state: 'success',
+									msg: sb_i18n.save_text
+								});
+							} else {
+								$rootScope.$emit('notification', {state: 'errror', msg: res.data});
+							}
+						});
+					};
+			
+					$scope.reset = function () {
+						wp_ajax({
+							action: 'NSB-reset_list'
+						}).success(function (res) {
+							$scope.bots = res.data;
+							$rootScope.$emit('notification', {
+								state: 'success',
+								msg: sb_i18n.save_reset_text
+							});
+						});
+					};
+			
+					$scope.add = function () {
+						$scope.bots.push($scope.bot);
+						$rootScope.$emit('notification', {
+							state: 'success',
+							msg: sb_i18n.bot_text + ' ' + $scope.bot.name + ' ' + sb_i18n.added_text
+						});
+						$scope.bot = {"state": true};
+					};
+			
+					$scope.remove = function (at) {
+						$rootScope.$emit('notification', {state: 'success', msg: sb_i18n.removed_text});
+						$scope.bots.splice(find_bot(at), 1);
+					};
+				});
+			})(angular, document, jQuery);
+		</script>
+		<?php
 	}
 
 	/**

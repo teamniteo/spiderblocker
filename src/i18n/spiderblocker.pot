@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-15T19:12:22+05:30\n"
+"POT-Creation-Date: 2020-07-20T15:38:48+05:30\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: spiderblocker\n"
@@ -125,22 +125,22 @@ msgstr ""
 msgid "Failed parsing JSON data."
 msgstr ""
 
-#: index.php:677
+#: index.php:678
 msgid "List of bots was saved and new blocklist applied!"
 msgstr ""
 
-#: index.php:678
+#: index.php:679
 msgid "List of bots was reset to defaults!"
 msgstr ""
 
-#: index.php:679
+#: index.php:680
 msgid "Bot"
 msgstr ""
 
-#: index.php:680
+#: index.php:681
 msgid "was added!"
 msgstr ""
 
-#: index.php:681
+#: index.php:682
 msgid "Bot was removed!"
 msgstr ""
