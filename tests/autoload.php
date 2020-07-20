@@ -1,19 +1,10 @@
 <?php
 
-	/**
-	 * @codeCoverageIgnore
-	 */
-function apache_mod_loaded() {
-	return true;
-}
+$root_dir = dirname( dirname( __FILE__ ) );
 
-	/**
-	 * @codeCoverageIgnore
-	 */
-function apache_get_version() {
-	return true;
-}
+require_once "$root_dir/vendor/autoload.php";
+require_once "$root_dir/vendor/antecedent/patchwork/Patchwork.php";
+require_once "$root_dir/src/index.php";
 
-	require_once __DIR__ . '/../vendor/autoload.php';
-	require_once __DIR__ . '/../vendor/antecedent/patchwork/Patchwork.php';
-	require_once __DIR__ . '/../src/index.php';
+WP_Mock::setUsePatchwork( true );
+WP_Mock::bootstrap();

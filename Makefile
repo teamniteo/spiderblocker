@@ -1,4 +1,4 @@
-VERSION := 1.2.0
+VERSION := 1.2.5
 PLUGINSLUG := spiderblocker
 SRCPATH := $(shell pwd)/src
 
@@ -64,7 +64,7 @@ i18n:
 	wp i18n make-pot src src/i18n/spiderblocker.pot
 
 cover: vendor
-	bin/coverage-check clover.xml 85
+	bin/coverage-check clover.xml 100
 
 clean:
 	rm -rf vendor/ bin
