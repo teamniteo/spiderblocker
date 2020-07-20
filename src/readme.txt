@@ -32,6 +32,9 @@ with Apache server and mod_rewrite enabled.
 
 
 == Changelog ==
+= v1.2.6 =
+- Fix issue with class constants
+
 = v1.2.5 =
 - Visual fixes and code clean-up
 - Added support for LiteSpeed server
