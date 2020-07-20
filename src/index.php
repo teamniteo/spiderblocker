@@ -24,42 +24,42 @@ class SpiderBlocker {
 	/**
 	 * @var string
 	 */
-	public const PLUGIN_NAME = 'Spider Blocker';
+	const PLUGIN_NAME = 'Spider Blocker';
 
 	/**
 	 * @var string
 	 */
-	public const PLUGIN_BASE = 'spiderblocker/index.php';
+	const PLUGIN_BASE = 'spiderblocker/index.php';
 
 	/**
 	 * @var string
 	 */
-	public const PLUGIN_VERSION = '@##VERSION##@';
+	const PLUGIN_VERSION = '@##VERSION##@';
 
 	/**
 	 * @var string
 	 */
-	public const MINIMUM_PHP_VERSION = '5.6';
+	const MINIMUM_PHP_VERSION = '5.6';
 
 	/**
 	 * @var string
 	 */
-	public const MINIMUM_WP_VERSION = '4.2.0';
+	const MINIMUM_WP_VERSION = '4.2.0';
 
 	/**
 	 * @var string
 	 */
-	public const OPTIONNAME = 'Niteoweb.SpiderBlocker.Bots';
+	const OPTIONNAME = 'Niteoweb.SpiderBlocker.Bots';
 
 	/**
 	 * @var string
 	 */
-	public const NONCE = 'Niteoweb.SpiderBlocker.Nonce';
+	const NONCE = 'Niteoweb.SpiderBlocker.Nonce';
 
 	/**
 	 * @var string
 	 */
-	public const CHECKHOOK = 'Niteoweb.SpiderBlocker.CheckHook';
+	const CHECKHOOK = 'Niteoweb.SpiderBlocker.CheckHook';
 
 	/**
 	 * @var array
