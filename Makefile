@@ -22,22 +22,22 @@ test: vendor
 
 dist: ensure
 	sed -i "s/@##VERSION##@/${VERSION}/" src/index.php
-	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/spiderblocker.pot
+	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/$(PLUGINSLUG).pot
 	mkdir -p dist
 	cp -r $(SRCPATH)/. dist/
 	sed -i "s/${VERSION}/@##VERSION##@/" src/index.php
-	sed -i "s/${VERSION}/@##VERSION##@/" src/i18n/spiderblocker.pot
+	sed -i "s/${VERSION}/@##VERSION##@/" src/i18n/$(PLUGINSLUG).pot
 
 build: ensure
 	sed -i "s/@##VERSION##@/${VERSION}/" src/index.php
-	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/spiderblocker.pot
+	sed -i "s/@##VERSION##@/${VERSION}/" src/i18n/$(PLUGINSLUG).pot
 	mkdir -p build
 	cp -ar $(SRCPATH) $(PLUGINSLUG)
 	zip -r $(PLUGINSLUG).zip $(PLUGINSLUG)
 	rm -rf $(PLUGINSLUG)
 	mv $(PLUGINSLUG).zip build/
 	sed -i "s/${VERSION}/@##VERSION##@/" src/index.php
-	sed -i "s/${VERSION}/@##VERSION##@/" src/i18n/spiderblocker.pot
+	sed -i "s/${VERSION}/@##VERSION##@/" src/i18n/$(PLUGINSLUG).pot
 
 release:
 	git stash
@@ -47,7 +47,6 @@ release:
 	git tag v$(VERSION)
 	git push origin v$(VERSION)
 	git pull -r
-	@echo "Go to the https://github.com/niteoweb/spiderblocker/releases/new?tag=v$(VERSION) and publish the release in order to build the package for distribution!"
 
 fmt: ensure
 	bin/phpcbf --standard=WordPress src
@@ -58,10 +57,10 @@ lint: ensure
 	bin/phpcs --standard=WordPress tests --ignore=vendor
 
 psr:
-	composer dump-autoload -a
+	composer dump-autoload -o
 
 i18n:
-	wp i18n make-pot src src/i18n/spiderblocker.pot
+	wp i18n make-pot src src/i18n/$(PLUGINSLUG).pot
 
 cover: vendor
 	bin/coverage-check clover.xml 100
