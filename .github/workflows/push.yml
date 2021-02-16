@@ -1,18 +1,22 @@
 on: push
-name: Tests
+name: PR Checks
 
 jobs:
   onMasterOrPR:
     name: On master or PR
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Set up PHP environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
     - name: Install Dependencies
       run: make ensure
     - name: Lint
       run: make fmt
-    - name: Test
+    - name: Tests
       run: make test
     - name: Cover
       run: make cover
-
