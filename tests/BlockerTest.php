@@ -1,8 +1,15 @@
 <?php
 
+namespace Niteoweb\SpiderBlocker\Tests;
+
 use Niteoweb\SpiderBlocker\SpiderBlocker;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Tests for testing plugin functionality.
+ *
+ * @coversDefaultClass \Niteoweb\SpiderBlocker\SpiderBlocker
+ */
 class BlockerTest extends TestCase {
 
 	function setUp() : void {
@@ -19,7 +26,7 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
+	 * @covers ::__construct
 	 */
 	public function testConstructor() {
 		$plugin = new SpiderBlocker();
@@ -41,9 +48,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::check_environment
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_environment_compatible
+	 * @covers ::__construct
+	 * @covers ::check_environment
+	 * @covers ::is_environment_compatible
 	 */
 	public function testCheckEnvironmentEmpty() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -53,15 +60,15 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::check_environment
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_environment_compatible
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::deactivate_plugin
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_admin_notice
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_environment_message
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_php_version
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_name
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_base
+	 * @covers ::__construct
+	 * @covers ::check_environment
+	 * @covers ::is_environment_compatible
+	 * @covers ::deactivate_plugin
+	 * @covers ::add_admin_notice
+	 * @covers ::get_environment_message
+	 * @covers ::get_php_version
+	 * @covers ::get_plugin_name
+	 * @covers ::get_plugin_base
 	 */
 	public function testCheckEnvironment() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -86,12 +93,12 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::check_server
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::deactivate_plugin
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_admin_notice
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_base
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_name
+	 * @covers ::__construct
+	 * @covers ::check_server
+	 * @covers ::deactivate_plugin
+	 * @covers ::add_admin_notice
+	 * @covers ::get_plugin_base
+	 * @covers ::get_plugin_name
 	 */
 	public function testCheckServer() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -102,12 +109,12 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_plugin_notices
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_wp_compatible
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::add_admin_notice
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_plugin_name
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_wp_version
+	 * @covers ::__construct
+	 * @covers ::add_plugin_notices
+	 * @covers ::is_wp_compatible
+	 * @covers ::add_admin_notice
+	 * @covers ::get_plugin_name
+	 * @covers ::get_wp_version
 	 */
 	public function testAddPluginNotices() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -136,8 +143,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::activate_plugin_notice
+	 * @covers ::__construct
+	 * @covers ::activate_plugin_notice
 	 */
 	public function testActivatePluginNoticeFalse() {
 		$plugin = new SpiderBlocker();
@@ -153,8 +160,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::activate_plugin_notice
+	 * @covers ::__construct
+	 * @covers ::activate_plugin_notice
 	 */
 	public function testActivatePluginNoticeTrue() {
 		$plugin = new SpiderBlocker();
@@ -176,8 +183,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::admin_notices
+	 * @covers ::__construct
+	 * @covers ::admin_notices
 	 */
 	public function testAdminNotices() {
 		$plugin          = new SpiderBlocker();
@@ -200,9 +207,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_wp_compatible
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_wp_version
+	 * @covers ::__construct
+	 * @covers ::is_wp_compatible
+	 * @covers ::get_wp_version
 	 */
 	public function testIsWpCompatible() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -211,9 +218,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_environment_compatible
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_php_version
+	 * @covers ::__construct
+	 * @covers ::is_environment_compatible
+	 * @covers ::get_php_version
 	 */
 	public function testEnvironmentCompatibleTrue() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -222,9 +229,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::is_environment_compatible
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_php_version
+	 * @covers ::__construct
+	 * @covers ::is_environment_compatible
+	 * @covers ::get_php_version
 	 */
 	public function testEnvironmentCompatibleFalse() {
 		$mock = \Mockery::mock( '\Niteoweb\SpiderBlocker\SpiderBlocker' )->makePartial();
@@ -233,8 +240,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::admin_menu
+	 * @covers ::__construct
+	 * @covers ::admin_menu
 	 */
 	public function testAdminMenu() {
 		\WP_Mock::wpFunction(
@@ -250,9 +257,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_rewrite_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::plugin_url
+	 * @covers ::__construct
+	 * @covers ::generate_rewrite_rules
+	 * @covers ::plugin_url
 	 */
 	public function testGenerateRewriteRules() {
 		global $wp_rewrite;
@@ -296,8 +303,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::plugin_url
+	 * @covers ::__construct
+	 * @covers ::plugin_url
 	 */
 	public function testPluginUrl() {
 		$plugin = new SpiderBlocker();
@@ -322,10 +329,10 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_rules
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
+	 * @covers ::get_bots
+	 * @covers ::get_rules
 	 */
 	public function testRulesGeneration() {
 		global $wp_rewrite;
@@ -411,9 +418,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::load_list
+	 * @covers ::__construct
+	 * @covers ::get_bots
+	 * @covers ::load_list
 	 */
 	public function testAjaxGetList() {
 		$plugin = new SpiderBlocker();
@@ -468,10 +475,10 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::reset_list
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
+	 * @covers ::get_bots
+	 * @covers ::reset_list
 	 */
 	public function testAjaxResetList() {
 		$plugin = new SpiderBlocker();
@@ -529,8 +536,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 * @covers ::__construct
+	 * @covers ::save_list
 	 */
 	public function testAjaxSaveListNoData() {
 		$plugin = new SpiderBlocker();
@@ -546,8 +553,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 * @covers ::__construct
+	 * @covers ::save_list
 	 */
 	public function testAjaxSaveListEmptyData() {
 		$plugin = new SpiderBlocker();
@@ -565,10 +572,10 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
+	 * @covers ::get_bots
+	 * @covers ::save_list
 	 */
 	public function testAjaxSaveList() {
 		$plugin = new SpiderBlocker();
@@ -658,10 +665,10 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
+	 * @covers ::get_bots
+	 * @covers ::save_list
 	 */
 	public function testAjaxUpdateList() {
 		$plugin = new SpiderBlocker();
@@ -757,10 +764,10 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::save_list
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
+	 * @covers ::get_bots
+	 * @covers ::save_list
 	 */
 	public function testAjaxUpdateListInvalid() {
 		$plugin = new SpiderBlocker();
@@ -789,8 +796,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::generate_block_rules
+	 * @covers ::__construct
+	 * @covers ::generate_block_rules
 	 */
 	public function testSkipRulesGeneration() {
 		$plugin = new SpiderBlocker();
@@ -806,8 +813,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::remove_block_rules
+	 * @covers ::__construct
+	 * @covers ::remove_block_rules
 	 */
 	public function testRemoveRulesGeneration() {
 		global $wp_rewrite;
@@ -879,9 +886,9 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_bots
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::robots_file
+	 * @covers ::__construct
+	 * @covers ::get_bots
+	 * @covers ::robots_file
 	 */
 	public function testRobotsFilter() {
 		$plugin = new SpiderBlocker();
@@ -928,8 +935,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::view_handler_load
+	 * @covers ::__construct
+	 * @covers ::view_handler_load
 	 */
 	public function testViewHandlerLoad() {
 		$plugin = new SpiderBlocker();
@@ -939,8 +946,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::view_handler_scripts
+	 * @covers ::__construct
+	 * @covers ::view_handler_scripts
 	 */
 	public function testViewHandlerScripts() {
 		$plugin = new SpiderBlocker();
@@ -974,8 +981,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_server_software
+	 * @covers ::__construct
+	 * @covers ::get_server_software
 	 */
 	public function testGetServerSoftwareEnv() {
 		$plugin = new SpiderBlocker();
@@ -996,8 +1003,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_server_software
+	 * @covers ::__construct
+	 * @covers ::get_server_software
 	 */
 	public function testGetServerSoftwareServer() {
 		$plugin = new SpiderBlocker();
@@ -1019,8 +1026,8 @@ class BlockerTest extends TestCase {
 	}
 
 	/**
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::__construct
-	 * @covers \Niteoweb\SpiderBlocker\SpiderBlocker::get_server_software
+	 * @covers ::__construct
+	 * @covers ::get_server_software
 	 */
 	public function testGetServerSoftwareFalse() {
 		$plugin = new SpiderBlocker();

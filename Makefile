@@ -64,7 +64,7 @@ i18n:
 	wp i18n make-pot src src/i18n/spiderblocker.pot
 
 cover: vendor
-	bin/coverage-check clover.xml 100
+	bin/coverage-check clover.xml 85
 
 clean:
 	rm -rf vendor/ bin
