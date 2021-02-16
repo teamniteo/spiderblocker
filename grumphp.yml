@@ -1,12 +1,11 @@
-parameters:
-    git_dir: .
-    bin_dir: vendor/bin
-    tasks:
-      file_size: ~
-      git_blacklist: ~
-      git_branch_name: ~
-      git_commit_message: ~
-      make:
-          make_file: ~
-          task: fmt
-          triggered_by: [php]
+grumphp:
+  tasks:
+    file_size: ~
+    git_blacklist: ~
+    git_branch_name: ~
+    git_commit_message:
+      max_body_width: 1000
+    make:
+      make_file: ~
+      task: fmt
+      triggered_by: [php]

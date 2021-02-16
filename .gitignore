@@ -12,3 +12,4 @@ reports
 clover.xml
 src/vendor
 dist
+.phpunit.result.cache

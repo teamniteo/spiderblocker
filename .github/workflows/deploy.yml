@@ -8,7 +8,12 @@ jobs:
     name: New tag
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Set up PHP environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
     - name: Build Plugin
       run: make dist
     - name: WordPress Plugin Deploy
