@@ -289,22 +289,28 @@ class SpiderBlocker {
 			'state' => true,
 		),
 		array(
-			'state' => true,
-			're'    => 'Baiduspider',
 			'name'  => 'Baidu',
+			're'    => 'Baiduspider',
 			'desc'  => 'http://www.baidu.com/search/robots_english.html',
+			'state' => true,
 		),
 		array(
-			'state' => true,
-			're'    => 'serpstat',
 			'name'  => 'Serpstat',
+			're'    => 'serpstat',
 			'desc'  => 'https://serpstat.com/',
+			'state' => true,
 		),
 		array(
-			'state' => true,
-			'desc'  => 'https://www.spyfu.com/',
-			're'    => 'spyfu',
 			'name'  => 'SpyFu',
+			're'    => 'spyfu',
+			'desc'  => 'https://www.spyfu.com/',
+			'state' => true,
+		),
+		array(
+			'name'  => 'Prlog',
+			're'    => 'Prlog',
+			'desc'  => 'https://prlog.ru/',
+			'state' => true,
 		),
 	);
 
