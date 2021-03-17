@@ -32,18 +32,22 @@ with Apache server and mod_rewrite enabled.
 
 
 == Changelog ==
+
+= v1.3.1 =
+* Added prlog.ru bot
+
 = v1.3.0 =
 * Added support for WP v5.6+
 
 = v1.2.6 =
-- Fix issue with class constants
+* Fix issue with class constants
 
 = v1.2.5 =
-- Visual fixes and code clean-up
-- Added support for LiteSpeed server
+* Visual fixes and code clean-up
+* Added support for LiteSpeed server
 
 = v1.2.0 =
-- Code clean-up
-- Support for the latest version of WordPress
+* Code clean-up
+* Support for the latest version of WordPress
 
 == Upgrade Notice ==
