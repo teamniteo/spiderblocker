@@ -3,7 +3,7 @@ Contributors: niteoweb
 Tags: seo, block, bots, htaccess, apache, secure
 Requires at least: 4.0
 Tested up to: 6.2.2
-Stable tag: 1.3.3
+Stable tag: 1.3.5
 
 SpiderBlocker will block most common bots that consume bandwidth and slow down your server.
 

@@ -1,4 +1,4 @@
-VERSION := 1.3.4
+VERSION := 1.3.5
 PLUGINSLUG := spiderblocker
 SRCPATH := $(shell pwd)/src
 
