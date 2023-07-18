@@ -2,7 +2,7 @@
 Contributors: niteoweb
 Tags: seo, block, bots, htaccess, apache, secure
 Requires at least: 4.0
-Tested up to: 6.1.1
+Tested up to: 6.2.2
 Stable tag: 1.3.3
 
 SpiderBlocker will block most common bots that consume bandwidth and slow down your server.
@@ -10,8 +10,11 @@ SpiderBlocker will block most common bots that consume bandwidth and slow down y
 == Description ==
 
 Spider Blocker will block most common bots that consume bandwidth and slow down your server. It will accomplish this by
-using Apache .htaccess file to minimize impact on your website. It will also hide itself from external scanner. Only works
-with Apache server and mod_rewrite enabled.
+using Apache .htaccess file to minimize impact on your website. It will also hide itself from external scanner. 
+
+Spider Blocker is specifically designed for Apache servers with mod_rewrite enabled, 
+allowing you to effortlessly safeguard your website from the most prevalent bots 
+that hamper performance and drain resources. 
 
 = Plugin Features =
 * Block Unlimited bots from viewing your site

@@ -8,7 +8,9 @@ SpiderBlocker will block most common bots that consume bandwidth and slow down y
 
 ## Description
 
-Spider Blocker will block most common bots that consume bandwidth and slow down your server. It will accomplish this by using Apache .htaccess file to minimize impact on your website. It will also hide itself from external scanner. Only works with Apache server and mod_rewrite enabled.
+Spider Blocker will block most common bots that consume bandwidth and slow down your server. It will accomplish this by using Apache .htaccess file to minimize impact on your website. It will also hide itself from external scanner.
+
+Spider Blocker is specifically designed for Apache servers with mod_rewrite enabled, allowing you to effortlessly safeguard your website from the most prevalent bots that hamper performance and drain resources. 
 
 More info on <a href="http://blog.easyblognetworks.com/2015/free-spider-blocker-plugin/">EBN blog</a>.
 
