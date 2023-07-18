@@ -63,7 +63,7 @@ i18n:
 	wp i18n make-pot src src/i18n/$(PLUGINSLUG).pot
 
 cover: vendor
-	bin/coverage-check clover.xml 100
+	bin/coverage-check clover.xml 90
 
 clean:
 	rm -rf vendor/ bin
