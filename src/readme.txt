@@ -3,7 +3,7 @@ Contributors: niteoweb
 Tags: seo, block, bots, htaccess, apache
 Requires at least: 4.0
 Tested up to: 6.5.2
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 
 SpiderBlocker will block most common bots that consume bandwidth and slow down your blog.
 
@@ -29,7 +29,7 @@ Spider Blocker is specifically designed for Apache servers with mod_rewrite enab
 == Frequently Asked Questions ==
 
 Will rules stay active after I deactivate the plugin?
-No, it’s a good practice for plugins to remove all changes they made to the system, thus rules will also be deleted from .htaccess.
+No, it’s a good practice for plugins to remove all changes they made to the blog, thus rules will also be deleted from .htaccess.
 
 == Screenshots ==
 
