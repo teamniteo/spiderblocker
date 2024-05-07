@@ -937,11 +937,11 @@ class SpiderBlocker {
 	 */
 	public function get_server_software( $server ) {
 		// Check Apache
-		if ( stristr( $_ENV['SERVER_SOFTWARE'], $server ) ) {
+		if ( isset( $_ENV['SERVER_SOFTWARE'] ) && stristr( $_ENV['SERVER_SOFTWARE'], $server ) ) {
 			return sanitize_text_field( $_ENV['SERVER_SOFTWARE'] );
 		}
 
-		if ( stristr( $_SERVER['SERVER_SOFTWARE'], $server ) ) {
+		if ( isset( $_SERVER['SERVER_SOFTWARE'] ) && stristr( $_SERVER['SERVER_SOFTWARE'], $server ) ) {
 			return sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] );
 		}
 
