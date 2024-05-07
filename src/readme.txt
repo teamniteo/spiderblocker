@@ -1,20 +1,18 @@
 === Plugin Name ===
 Contributors: niteoweb
-Tags: seo, block, bots, htaccess, apache, secure
+Tags: seo, block, bots, htaccess, apache
 Requires at least: 4.0
 Tested up to: 6.5.2
 Stable tag: 1.3.6
 
-SpiderBlocker will block most common bots that consume bandwidth and slow down your server.
+SpiderBlocker will block most common bots that consume bandwidth and slow down your blog.
 
 == Description ==
 
-Spider Blocker will block most common bots that consume bandwidth and slow down your server. It will accomplish this by
-using Apache .htaccess file to minimize impact on your website. It will also hide itself from external scanner. 
+Spider Blocker blocks most common bots that consume bandwidth and slow down your blog.
+It accomplishes this by using .htaccess file to minimize impact on your website. It's hidden from external scanners. 
 
-Spider Blocker is specifically designed for Apache servers with mod_rewrite enabled, 
-allowing you to effortlessly safeguard your website from the most prevalent bots 
-that hamper performance and drain resources. 
+Spider Blocker is specifically designed for Apache servers with mod_rewrite enabled, allowing you to effortlessly safeguard your website from the most prevalent bots that hamper performance and drain resources.
 
 = Plugin Features =
 * Block Unlimited bots from viewing your site
@@ -30,6 +28,8 @@ that hamper performance and drain resources.
 
 == Frequently Asked Questions ==
 
+Will rules stay active after I deactivate the plugin?
+No, it’s a good practice for plugins to remove all changes they made to the system, thus rules will also be deleted from .htaccess.
 
 == Screenshots ==
 
