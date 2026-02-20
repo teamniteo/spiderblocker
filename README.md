@@ -1,7 +1,5 @@
 # SpiderBlocker
 
-![](https://github.com/niteoweb/spiderblocker/workflows/Tests/badge.svg)
-
 ## Info
 
 SpiderBlocker will block most common bots that consume bandwidth and slow down your server.
@@ -25,7 +23,3 @@ More info on <a href="http://blog.easyblognetworks.com/2015/free-spider-blocker-
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to **Tools** menu and then **SpiderBlocker* to configure
 4. If you use any other plugin to edit .htaacess file, make sure that content of file is valid
-
-## We're hiring!
-
-At Niteo we regularly contribute back to the Open Source community. If you do too, we'd like to invite you to [join our team](https://niteo.co/careers)!
